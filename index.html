@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="https://bafenban.com/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="https://bafenban.com/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://bafenban.com/icon-192x192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="多半不会有用，多半不会成功，知识只是照见某个角落的灵光。">
+<title>八分半</title>
+
+<style>
+@font-face {
+  font-family: 'ToaHI-Rg-eng';
+  src: url('https://bafenban.com/fonts/ToaHI-Rg-eng.woff') format('woff'),
+       url('https://bafenban.com/fonts/ToaHI-Rg-eng.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+body {
+    margin: 0;
+    font-family: 'ToaHI-Rg-eng', sans-serif;
+    text-align: right;
+}
+h1{
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 80vw;
+}
+a{
+    text-decoration: none;
+    color: #FAFAFA;
+    font-size: max(3vw, 20px);
+    white-space: nowrap;
+    display: inline-block;
+}
+</style>
+</head>
+
+<body>
+<h1>
+    <a id="rss" href="https://bafenban.com/rss.xml" aria-label="八分半 播客 RSS 订阅 链接">https://bafenban.com/rss.xml</a>
+</h1>
+
+<script>
+const isBot = /bot|crawler|spider|crawling/i.test(navigator.userAgent);
+
+const rssLink = document.getElementById('rss');
+const glitchChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`█▓▒░';
+
+const textNodes = [];
+const originalTexts = [];
+
+function collectTextNodes(node) {
+    node.childNodes.forEach(child => {
+        if (child.nodeType === Node.TEXT_NODE) {
+            textNodes.push(child);
+            originalTexts.push(child.textContent);
+        } else {
+            collectTextNodes(child);
+        }
+    });
+}
+
+collectTextNodes(rssLink);
+
+function adjustFontSize() {
+    const maxWidth = window.innerWidth * 0.8;
+    let fontSize = Math.max(window.innerWidth * 0.03, 20);
+    
+    rssLink.style.fontSize = fontSize + 'px';
+    
+    while (rssLink.scrollWidth > maxWidth && fontSize > 10) {
+        fontSize -= 0.5;
+        rssLink.style.fontSize = fontSize + 'px';
+    }
+}
+
+function updateBgColor() {
+    const hex = new Date().toTimeString().slice(0, 8).replace(/:/g, '');
+    const color = `#${hex}`;
+    document.body.style.backgroundColor = color;
+}
+
+function glitchText() {
+    const changeProbability = Math.random() * 0.4;
+    
+    textNodes.forEach((node, i) => {
+        const original = originalTexts[i];
+        const glitched = original.split('').map(char => {
+            if (Math.random() < changeProbability) {
+                if (/[a-z]/i.test(char)) {
+                    if (Math.random() < 0.5) {
+                        return char.toUpperCase();
+                    } else {
+                        return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                    }
+                } else {
+                    return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                }
+            }
+            return char;
+        }).join('');
+        
+        node.textContent = glitched;
+    });
+    
+    const randomDelay = Math.floor(Math.random() * 597) + 4;
+    setTimeout(glitchText, randomDelay);
+}
+
+document.fonts.ready.then(() => {
+    adjustFontSize();
+});
+
+window.addEventListener('resize', adjustFontSize);
+
+if (!isBot) {
+    updateBgColor();
+    setInterval(updateBgColor, 1000);
+    glitchText();
+}
+</script>
+</body>
+</html>
