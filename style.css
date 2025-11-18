@@ -1,4 +1,4 @@
-/* style.css (完整内容 - 已修复移动端布局) */
+/* style.css (完整内容 - 已包含移动端修复和历史记录多行显示) */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f7f9;
@@ -332,19 +332,24 @@ textarea {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
+/* 修改：允许历史记录源文本显示最多 3 行 */
 .history-item-source {
     font-weight: bold;
-    color: #333; /* 更改：改为黑色 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
+    color: #333; 
+    
+    /* 多行截断样式 */
+    display: -webkit-box;          /* 启用弹性盒子布局 */
+    -webkit-line-clamp: 3;         /* 限制显示的行数为 3 行 */
+    -webkit-box-orient: vertical;  /* 设置子元素垂直排列 */
+    overflow: hidden;              /* 隐藏超出 3 行的内容 */
+    white-space: normal;           /* 允许文本换行 */
+    word-break: break-word;        /* 在单词边界换行 */
 }
 
 .history-item-translation {
     color: #555; /* 更改：改为深灰色 */
     font-size: 14px;
-    white-space: nowrap;
+    white-space: nowrap; /* 翻译结果保持单行，如需多行可仿照上面修改 */
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
@@ -359,11 +364,11 @@ textarea {
         padding: 15px;
     }
 
-    /* --- 修复开始：强制保持一行显示 --- */
+    /* --- 移动端修复：强制保持一行显示 --- */
     .lang-selection {
-        flex-wrap: nowrap; /* 关键：禁止换行 */
+        flex-wrap: nowrap; /* 禁止换行 */
         justify-content: space-between;
-        gap: 5px; /* 稍微减小间距 */
+        gap: 5px; 
     }
 
     .lang-select {
@@ -371,14 +376,13 @@ textarea {
         flex-basis: 0; /* 关键：让 flex-grow 决定宽度，无固定基准 */
         min-width: 0;  /* 关键：允许无限缩小，防止撑开容器 */
         width: auto;
-        padding: 10px 5px; /* 减小内边距以节省空间 */
+        padding: 10px 5px; 
     }
     
     #swapButton {
-        flex-shrink: 0; /* 关键：防止中间按钮被挤压 */
+        flex-shrink: 0; /* 防止中间按钮被挤压 */
         padding: 8px 12px;
     }
-    /* --- 修复结束 --- */
 
     /* 移动端布局：垂直堆叠 */
     .textarea-group {
