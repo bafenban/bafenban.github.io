@@ -67,8 +67,14 @@ h1 {
     margin-bottom: 20px;
 }
 
-textarea {
+/* 新增：文本区域包裹器，用于定位按钮 */
+.textarea-wrapper {
+    position: relative;
     width: 50%;
+}
+
+textarea {
+    width: 100%; /* 占据包裹器的全部宽度 */
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -76,6 +82,43 @@ textarea {
     resize: vertical;
     min-height: 250px;
     box-sizing: border-box;
+}
+
+/* 新增：角落按钮通用样式 */
+.textarea-corner-btn {
+    position: absolute;
+    top: 10px; /* 距离顶部 */
+    right: 10px; /* 距离右侧 */
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    opacity: 0.8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 清除按钮特有样式 */
+.clear-btn {
+    background-color: #f8d7da; /* 浅红 */
+    color: #721c24; /* 深红文字 */
+}
+
+.clear-btn:hover {
+    background-color: #f5c6cb;
+    opacity: 1;
+}
+
+/* 复制按钮特有样式 */
+.copy-btn {
+    background-color: #d1ecf1; /* 浅蓝绿 */
+    color: #0c5460; /* 深蓝绿文字 */
+}
+
+.copy-btn:hover {
+    background-color: #bee5eb;
+    opacity: 1;
 }
 
 /* 翻译按钮样式 */
@@ -207,10 +250,90 @@ textarea {
     color: #555;
 }
 
+
+/* --- 历史记录面板样式 --- */
+.history-panel {
+    margin-top: 25px;
+}
+
+.history-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px dashed #e0e0e0;
+    margin-top: 10px;
+}
+
+#clearHistoryButton {
+    padding: 8px 15px;
+    background-color: #dc3545; /* 红色警告 */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#clearHistoryButton:hover {
+    background-color: #c82333;
+}
+
+#historyCount {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+    max-height: 400px; /* 限制高度并启用滚动 */
+    overflow-y: auto;
+}
+
+.history-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+}
+
+.history-item:hover {
+    background-color: #e9f5ff; /* 浅蓝色高亮 */
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.1);
+}
+
+.history-item-source {
+    font-weight: bold;
+    color: #007bff; /* 蓝色强调 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.history-item-translation {
+    color: #6c757d;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-top: 4px;
+}
+
 /* 媒体查询：小屏幕上所有配置项垂直堆叠 */
 @media (max-width: 768px) {
     .textarea-group {
         flex-direction: column;
+    }
+    .textarea-wrapper {
+        width: 100%;
     }
     textarea {
         width: 100%;
