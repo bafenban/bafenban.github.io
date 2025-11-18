@@ -17,25 +17,24 @@
         </div>
         
         <div class="textarea-group">
-            <textarea id="inputText" placeholder="在这里输入您需要翻译的文本..." rows="10"></textarea>
-            <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
+            <!-- 输入框及其按钮的容器 -->
+            <div class="textarea-wrapper">
+                <textarea id="inputText" placeholder="在这里输入您需要翻译的文本..." rows="10"></textarea>
+                <!-- 新增：清除按钮 -->
+                <button id="clearInputButton" class="textarea-corner-btn clear-btn" title="清除全部内容">❌ 清除</button>
+            </div>
+            
+            <!-- 输出框及其按钮的容器 -->
+            <div class="textarea-wrapper">
+                <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
+                <!-- 新增：复制按钮 -->
+                <button id="copyOutputButton" class="textarea-corner-btn copy-btn" title="复制全部翻译结果">📋 复制</button>
+            </div>
         </div>
         
         <button id="translateButton">开始翻译</button>
         <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
 
-        <!-- 历史记录面板 -->
-        <details id="historyPanel" class="settings-panel history-panel">
-            <summary>🕒 翻译历史记录</summary>
-            <div class="history-controls">
-                <button id="clearHistoryButton">清空历史记录</button>
-                <span id="historyCount">0 条记录</span>
-            </div>
-            <ul id="historyList" class="history-list">
-                <!-- 历史记录项将由 JavaScript 渲染 -->
-            </ul>
-        </details>
-        
         <details class="settings-panel">
             <summary>⚙️ API & 模型设置</summary>
             <div class="api-config">
@@ -54,6 +53,17 @@
             </div>
         </details>
 
+        <!-- 历史记录面板 -->
+        <details id="historyPanel" class="settings-panel history-panel">
+            <summary>🕒 翻译历史记录</summary>
+            <div class="history-controls">
+                <button id="clearHistoryButton">清空历史记录</button>
+                <span id="historyCount">0 条记录</span>
+            </div>
+            <ul id="historyList" class="history-list">
+                <!-- 历史记录项将由 JavaScript 渲染 -->
+            </ul>
+        </details>
 
     </div>
 
@@ -61,4 +71,3 @@
 </body>
 
 </html>
-
