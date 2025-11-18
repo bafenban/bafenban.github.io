@@ -3,7 +3,7 @@
 // 1. 数据定义与常量
 const DEFAULT_ENDPOINT = "https://api.openai.com/v1/chat/completions";
 const HISTORY_KEY = 'translationHistory'; // 历史记录的本地存储键
-const MAX_HISTORY_SIZE = 10; // 最大历史记录条数
+const MAX_HISTORY_SIZE = 100; // 最大历史记录条数
 
 // 增加常用语言
 const LANGUAGE_OPTIONS = {
