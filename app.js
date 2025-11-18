@@ -235,7 +235,7 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
     }
 
     // 翻译过程中不设置自动隐藏
-    setStatus(`⏳ 正在使用 ${model} 模型请求翻译...`, false);
+    setStatus(`⏳ 正在使用 ${model} 请求翻译...`, false);
     outputText.value = '';
 
     const sourceText = sourceLang === "Auto Detect" ? "源语言" : LANGUAGE_OPTIONS[sourceLang];
