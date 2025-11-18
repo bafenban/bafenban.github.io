@@ -17,24 +17,28 @@
         </div>
         
         <div class="textarea-group">
-            <!-- 1. 输入框及其按钮的容器 -->
-            <div class="textarea-wrapper">
+            <!-- 1. Input Column (Left) -->
+            <div class="textarea-wrapper input-column">
                 <textarea id="inputText" placeholder="在这里输入您需要翻译的文本..." rows="10"></textarea>
                 <!-- 清除按钮已移至右下角 -->
                 <button id="clearInputButton" class="textarea-corner-btn clear-btn" title="清除全部内容">❌</button>
             </div>
             
-            <!-- 2. 翻译按钮和状态信息 - 位于 Input 和 Output 之间 -->
-            <div class="translate-button-wrapper">
-                <button id="translateButton">翻译</button>
-                <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
-            </div>
-            
-            <!-- 3. 输出框及其按钮的容器 -->
-            <div class="textarea-wrapper">
-                <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
-                <!-- 复制按钮已移至右下角 -->
-                <button id="copyOutputButton" class="textarea-corner-btn copy-btn" title="复制全部翻译结果">📋</button>
+            <!-- 2. Output Column (Right, containing button and output text) -->
+            <div class="output-column">
+                <!-- Button and Status at the very top of the right column -->
+                <div class="translate-button-wrapper">
+                    <!-- 翻译按钮文本修改为中文 "翻译" -->
+                    <button id="translateButton">翻译</button> 
+                    <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
+                </div>
+                
+                <!-- Output text area content -->
+                <div class="textarea-wrapper">
+                    <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
+                    <!-- 复制按钮已移至右下角 -->
+                    <button id="copyOutputButton" class="textarea-corner-btn copy-btn" title="复制全部翻译结果">📋</button>
+                </div>
             </div>
         </div>
 
