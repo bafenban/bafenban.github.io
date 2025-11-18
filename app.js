@@ -1,7 +1,9 @@
-// app.js (完整内容，支持流式输出、定制配置和本地存储)
+// app.js (完整内容，支持流式输出、定制配置、本地存储和历史记录)
 
 // 1. 数据定义与常量
 const DEFAULT_ENDPOINT = "https://api.openai.com/v1/chat/completions";
+const HISTORY_KEY = 'translationHistory'; // 历史记录的本地存储键
+const MAX_HISTORY_SIZE = 10; // 最大历史记录条数
 
 const LANGUAGE_OPTIONS = {
     "Auto Detect": "自动检测",
@@ -27,6 +29,10 @@ const inputText = document.getElementById('inputText');
 const outputText = document.getElementById('outputText');
 const statusMessage = document.getElementById('statusMessage');
 
+// 新增：输入/输出框辅助按钮
+const clearInputButton = document.getElementById('clearInputButton');
+const copyOutputButton = document.getElementById('copyOutputButton');
+
 // API 配置输入字段
 const apiEndpointInput = document.getElementById('apiEndpoint');
 const apiKeyInput = document.getElementById('apiKey');
@@ -39,6 +45,11 @@ const resetUrlButton = document.getElementById('resetUrlButton');
 const sourceLangSelect = document.getElementById('sourceLangSelect');
 const targetLangSelect = document.getElementById('targetLangSelect');
 const swapButton = document.getElementById('swapButton');
+
+// 历史记录字段
+const historyList = document.getElementById('historyList');
+const clearHistoryButton = document.getElementById('clearHistoryButton');
+const historyCountSpan = document.getElementById('historyCount');
 
 
 // 3. 辅助函数：显示/隐藏状态信息
@@ -72,7 +83,10 @@ function initializeApp() {
     // 4.3 加载保存的配置
     loadSettings();
     
-    // 4.4 初始状态
+    // 4.4 加载并渲染历史记录
+    renderHistory();
+
+    // 4.5 初始状态
     setStatus("", true); 
 }
 
@@ -108,6 +122,92 @@ function loadSettings() {
 function saveSetting(key, value) {
     localStorage.setItem(key, value);
 }
+
+// 5.1 历史记录管理函数
+function loadHistory() {
+    try {
+        const historyJson = localStorage.getItem(HISTORY_KEY);
+        // 历史记录存储为数组，并确保是有效的 JSON 格式
+        return historyJson ? JSON.parse(historyJson) : [];
+    } catch (e) {
+        console.error("加载历史记录失败:", e);
+        return [];
+    }
+}
+
+function saveHistory(history) {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+// 添加历史记录条目
+function addHistoryEntry(sourceText, targetText, sourceLang, targetLang) {
+    let history = loadHistory();
+    
+    const newEntry = {
+        source: sourceText,
+        translation: targetText,
+        sourceLang: sourceLang,
+        targetLang: targetLang,
+        timestamp: new Date().toISOString(),
+    };
+
+    // 检查是否重复（简化：只检查最近一条记录的文本是否完全相同）
+    if (history.length > 0 && 
+        history[0].source === sourceText && 
+        history[0].translation === targetText) {
+        // 如果与最新记录重复，则不添加
+        return;
+    }
+    
+    // 将新条目添加到数组开头
+    history.unshift(newEntry);
+
+    // 保持最大记录数
+    if (history.length > MAX_HISTORY_SIZE) {
+        history = history.slice(0, MAX_HISTORY_SIZE);
+    }
+
+    saveHistory(history);
+    renderHistory(); // 重新渲染列表
+}
+
+// 渲染历史记录列表
+function renderHistory() {
+    const history = loadHistory();
+    historyList.innerHTML = ''; // 清空现有列表
+    
+    historyCountSpan.textContent = `${history.length} 条记录`;
+    
+    if (history.length === 0) {
+        historyList.innerHTML = '<li style="text-align: center; color: #999; padding: 10px;">暂无翻译记录</li>';
+        return;
+    }
+
+    history.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.classList.add('history-item');
+        // 将完整的历史记录对象存储在 DOM 元素上，方便点击时读取
+        li.dataset.index = index; 
+        
+        // 截断文本以适应列表显示
+        const SOURCE_LIMIT = 50;
+        const TRANSLATION_LIMIT = 50;
+
+        const sourceDisplay = entry.source.length > SOURCE_LIMIT ? entry.source.substring(0, SOURCE_LIMIT) + '...' : entry.source;
+        const translationDisplay = entry.translation.length > TRANSLATION_LIMIT ? entry.translation.substring(0, TRANSLATION_LIMIT) + '...' : entry.translation;
+
+        const sourceLangText = LANGUAGE_OPTIONS[entry.sourceLang] || entry.sourceLang;
+        const targetLangText = LANGUAGE_OPTIONS[entry.targetLang] || entry.targetLang;
+
+        li.innerHTML = `
+            <span class="history-item-source" title="${entry.source}">[${sourceLangText} -> ${targetLangText}] ${sourceDisplay}</span>
+            <span class="history-item-translation" title="${entry.translation}">${translationDisplay}</span>
+        `;
+        
+        historyList.appendChild(li);
+    });
+}
+
 
 // 6. 核心功能：调用 LLM API (支持流式和非流式)
 async function callLLMForTranslation(text, endpoint, key, model, temperature, sourceLang, targetLang, useStreaming) {
@@ -151,11 +251,12 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
             throw new Error(`API 错误: ${errorMessage} (HTTP ${response.status})`);
         }
 
+        let translatedText = '';
+        
         if (useStreaming) {
             // --------------------- 流式处理逻辑 ---------------------
             const reader = response.body.getReader();
             const decoder = new TextDecoder("utf-8");
-            let fullText = '';
             
             setStatus("📝 正在流式接收翻译结果...", false);
 
@@ -176,8 +277,8 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
                             const content = data.choices[0]?.delta?.content;
                             
                             if (content) {
-                                fullText += content;
-                                outputText.value = fullText;
+                                translatedText += content;
+                                outputText.value = translatedText;
                                 outputText.scrollTop = outputText.scrollHeight; 
                             }
                         } catch (e) {
@@ -191,10 +292,15 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
         } else {
             // --------------------- 非流式处理逻辑 ---------------------
             const data = await response.json();
-            const translatedText = data.choices[0].message.content.trim(); 
+            translatedText = data.choices[0].message.content.trim(); 
             outputText.value = translatedText;
             setStatus("✅ 翻译完成！", true);
             // --------------------- 非流式处理逻辑结束 ---------------------
+        }
+
+        // 7. 翻译成功后：添加历史记录
+        if (translatedText.length > 0) {
+            addHistoryEntry(text, translatedText, sourceLang, targetLang);
         }
 
     } catch (error) {
@@ -207,7 +313,7 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
     }
 }
 
-// 7. 事件监听器
+// 8. 事件监听器
 
 // 翻译按钮点击事件
 translateButton.addEventListener('click', () => {
@@ -241,6 +347,43 @@ translateButton.addEventListener('click', () => {
     );
 });
 
+// 新增：清除输入按钮事件
+clearInputButton.addEventListener('click', () => {
+    inputText.value = '';
+    setStatus("输入文本已清除。", false);
+});
+
+// 新增：复制输出按钮事件
+copyOutputButton.addEventListener('click', () => {
+    const textToCopy = outputText.value;
+    if (textToCopy.trim() === "") {
+        setStatus("📋 复制失败：没有可复制的翻译结果。", false, true);
+        return;
+    }
+    
+    // 使用 document.execCommand('copy') 实现跨浏览器复制（适用于iframe环境）
+    inputText.select(); // 选中输入框是为了防止选择集为空
+    const tempTextarea = document.createElement('textarea');
+    tempTextarea.value = textToCopy;
+    document.body.appendChild(tempTextarea);
+    tempTextarea.select();
+    try {
+        const success = document.execCommand('copy');
+        if (success) {
+            setStatus("✅ 翻译结果已成功复制到剪贴板！", false);
+        } else {
+            throw new Error("浏览器不支持execCommand('copy')");
+        }
+    } catch (err) {
+        console.error('复制操作失败:', err);
+        setStatus("❌ 复制失败，请手动复制。", false, true);
+    } finally {
+        document.body.removeChild(tempTextarea);
+        inputText.blur(); // 确保输入框失去焦点
+    }
+});
+
+
 // 重置 URL 按钮事件
 resetUrlButton.addEventListener('click', () => {
     apiEndpointInput.value = DEFAULT_ENDPOINT;
@@ -265,6 +408,48 @@ swapButton.addEventListener('click', () => {
     saveSetting('sourceLang', currentTarget);
     saveSetting('targetLang', currentSource);
     setStatus("语言方向已互换。", false);
+});
+
+
+// 历史记录列表点击事件：加载记录到文本框
+historyList.addEventListener('click', (event) => {
+    const item = event.target.closest('.history-item');
+    if (!item) return;
+
+    const index = parseInt(item.dataset.index);
+    const history = loadHistory();
+    const entry = history[index];
+
+    if (entry) {
+        // 1. 加载源文本和目标文本
+        inputText.value = entry.source;
+        outputText.value = entry.translation;
+
+        // 2. 加载语言设置
+        sourceLangSelect.value = entry.sourceLang;
+        targetLangSelect.value = entry.targetLang;
+        
+        // 3. 保存语言设置到本地存储
+        saveSetting('sourceLang', entry.sourceLang);
+        saveSetting('targetLang', entry.targetLang);
+
+        setStatus(`已加载历史记录：[${LANGUAGE_OPTIONS[entry.sourceLang] || entry.sourceLang} -> ${LANGUAGE_OPTIONS[entry.targetLang] || entry.targetLang}]`, false);
+    }
+});
+
+// 清空历史记录按钮事件
+clearHistoryButton.addEventListener('click', () => {
+    
+    const currentHistory = loadHistory();
+    if (currentHistory.length === 0) {
+        setStatus("❌ 历史记录已经是空的了。", false, true);
+        return;
+    }
+    
+    // 实际执行清除
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+    setStatus("✅ 历史记录已清空。", false);
 });
 
 
