@@ -7,16 +7,16 @@ const MAX_HISTORY_SIZE = 100; // 最大历史记录条数
 
 // 增加常用语言
 const LANGUAGE_OPTIONS = {
-    "Auto Detect": "自动检测",
-    "Simplified Chinese": "简体中文",
-    "English": "英文",
-    "Japanese": "日文",
-    "Traditional Chinese": "繁体中文",
-    "Korean": "韩文",
-    "French": "法文",
-    "German": "德文",
-    "Spanish": "西班牙文",
-    "Russian": "俄文",
+    "Auto Detect": "🌐Auto",
+    "Simplified Chinese": "🇨🇳简体中文",
+    "Traditional Chinese": "🇹🇼正體中文",
+    "English": "🇺🇸English",
+    "Japanese": "🇯🇵日本語",
+    "Korean": "🇰🇷한국어",
+    "French": "🇫🇷français",
+    "German": "🇩🇪Deutsch",
+    "Spanish": "🇪🇸español",
+    "Russian": "🇷🇺русский язык",
 };
 
 const MODEL_OPTIONS = [
@@ -475,3 +475,4 @@ targetLangSelect.addEventListener('change', () => saveSetting('targetLang', targ
 
 // 页面加载时运行初始化
 window.onload = initializeApp;
+
