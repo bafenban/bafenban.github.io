@@ -207,7 +207,8 @@ function renderHistory() {
         li.classList.add('history-item');
         li.dataset.index = index; 
         
-        const SOURCE_LIMIT = 50;
+        // 修改：将字符截断限制增加到 300，以便 CSS 可以显示多行
+        const SOURCE_LIMIT = 300; 
         const TRANSLATION_LIMIT = 50;
 
         const sourceDisplay = entry.source.length > SOURCE_LIMIT ? entry.source.substring(0, SOURCE_LIMIT) + '...' : entry.source;
