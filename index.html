@@ -17,28 +17,26 @@
         </div>
         
         <div class="textarea-group">
-            <!-- 输入框及其按钮的容器 -->
+            <!-- 1. 输入框及其按钮的容器 -->
             <div class="textarea-wrapper">
                 <textarea id="inputText" placeholder="在这里输入您需要翻译的文本..." rows="10"></textarea>
                 <!-- 清除按钮已移至右下角 -->
                 <button id="clearInputButton" class="textarea-corner-btn clear-btn" title="清除全部内容">❌</button>
             </div>
             
-            <!-- 翻译按钮和状态信息 - 新位置：在移动端位于输入框和输出框之间 -->
+            <!-- 2. 翻译按钮和状态信息 - 位于 Input 和 Output 之间 -->
             <div class="translate-button-wrapper">
-                <button id="translateButton">开始翻译</button>
+                <button id="translateButton">翻译</button>
                 <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
             </div>
             
-            <!-- 输出框及其按钮的容器 -->
+            <!-- 3. 输出框及其按钮的容器 -->
             <div class="textarea-wrapper">
                 <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
                 <!-- 复制按钮已移至右下角 -->
                 <button id="copyOutputButton" class="textarea-corner-btn copy-btn" title="复制全部翻译结果">📋</button>
             </div>
         </div>
-        
-        <!-- 原来的翻译按钮和状态信息已移除 -->
 
         <!-- 历史记录面板 -->
         <details id="historyPanel" class="settings-panel history-panel">
