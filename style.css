@@ -67,6 +67,11 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* 翻译按钮和状态信息的新容器：默认隐藏在桌面端，以保持文本区域并排 */
+.translate-button-wrapper {
+    display: none; 
+}
+
 /* 新增：文本区域包裹器，用于定位按钮 */
 .textarea-wrapper {
     position: relative;
@@ -87,7 +92,7 @@ textarea {
 /* 新增：角落按钮通用样式 */
 .textarea-corner-btn {
     position: absolute;
-    top: 10px; /* 距离顶部 */
+    bottom: 10px; /* 移到右下角 */
     right: 10px; /* 距离右侧 */
     padding: 5px 10px;
     border: none;
@@ -327,17 +332,31 @@ textarea {
     margin-top: 4px;
 }
 
-/* 媒体查询：小屏幕上所有配置项垂直堆叠 */
+/* 媒体查询：小屏幕样式调整 */
 @media (max-width: 768px) {
     .textarea-group {
         flex-direction: column;
+        gap: 0; /* 移除 flex 容器的 gap，使用子元素的 margin 来控制间距 */
     }
+    
     .textarea-wrapper {
         width: 100%;
+        margin-bottom: 15px; /* 在文本框下方添加间距 */
     }
-    textarea {
+    
+    /* 移动端：显示按钮和状态信息，并设置间距 */
+    .translate-button-wrapper {
+        display: block;
+        width: 100%;
+        margin-bottom: 15px; /* 按钮组下方添加间距，与输出框隔开 */
+        text-align: center;
+    }
+    
+    /* 确保 translateButton 在移动端是全宽的 */
+    #translateButton {
         width: 100%;
     }
+    
     /* 小屏幕上 API 相关的控件全部独占一行 */
     #apiEndpoint, #resetUrlButton, #apiKey, #modelSelect, #temperatureInput {
         flex-basis: 100%;
