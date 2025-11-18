@@ -29,7 +29,7 @@ const inputText = document.getElementById('inputText');
 const outputText = document.getElementById('outputText');
 const statusMessage = document.getElementById('statusMessage');
 
-// 新增：输入/输出框辅助按钮
+// 输入/输出框辅助按钮
 const clearInputButton = document.getElementById('clearInputButton');
 const copyOutputButton = document.getElementById('copyOutputButton');
 
@@ -362,9 +362,12 @@ copyOutputButton.addEventListener('click', () => {
     }
     
     // 使用 document.execCommand('copy') 实现跨浏览器复制（适用于iframe环境）
-    inputText.select(); // 选中输入框是为了防止选择集为空
+    // 为了让 execCommand 成功，需要选择一些内容。这里通过创建一个临时 textarea 来实现。
     const tempTextarea = document.createElement('textarea');
     tempTextarea.value = textToCopy;
+    // 隐藏元素但保持可操作性
+    tempTextarea.style.position = 'fixed';
+    tempTextarea.style.opacity = '0'; 
     document.body.appendChild(tempTextarea);
     tempTextarea.select();
     try {
@@ -379,7 +382,6 @@ copyOutputButton.addEventListener('click', () => {
         setStatus("❌ 复制失败，请手动复制。", false, true);
     } finally {
         document.body.removeChild(tempTextarea);
-        inputText.blur(); // 确保输入框失去焦点
     }
 });
 
