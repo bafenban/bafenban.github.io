@@ -17,7 +17,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 1000px; /* 增加最大宽度以匹配截图的宽大感 */
+    max-width: 1000px; 
 }
 
 h1 {
@@ -38,12 +38,12 @@ h1 {
 }
 
 .lang-select {
-    flex-grow: 0; /* 不再占据全部宽度 */
+    flex-grow: 0; 
     padding: 10px;
-    border: none; /* 移除边框 */
-    border-radius: 0; /* 移除圆角 */
+    border: none; 
+    border-radius: 0; 
     font-size: 16px;
-    background-color: transparent; /* 透明背景 */
+    background-color: transparent; 
     cursor: pointer;
     font-weight: 500;
     text-align: center;
@@ -74,41 +74,31 @@ h1 {
 .textarea-group {
     display: flex;
     gap: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 0; /* 移除底部边距，让按钮区域接管 */
     flex-wrap: nowrap; /* 桌面端不换行 */
 }
 
-.input-column {
-    /* 桌面端：Input 占据 50% */
-    width: 50%;
+/* 桌面端：Input 和 Output 占据等宽空间 (50%) */
+.textarea-wrapper {
+    position: relative;
+    /* 左右等宽 */
+    width: calc(50% - 10px); 
+    flex-shrink: 0;
+}
+
+.input-wrapper {
     border-right: 1px solid #eee; /* 添加分隔线 */
     padding-right: 20px;
     box-sizing: border-box;
+    order: 1;
 }
 
-.output-column {
-    /* 桌面端：Output 占据 50% */
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* 按钮和输出内容之间的间距 */
+.output-wrapper {
+    padding-left: 0; 
+    box-sizing: border-box;
+    order: 2;
 }
 
-/* 翻译按钮容器 (位于右侧栏顶部) */
-.translate-button-wrapper {
-    width: 100%;
-    /* 确保按钮居右对齐，类似截图 */
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-
-/* 输入/输出文本框的通用样式 */
-.textarea-wrapper {
-    position: relative;
-    width: 100%;
-}
 
 textarea {
     width: 100%; 
@@ -116,33 +106,29 @@ textarea {
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
-    resize: none; /* 禁用 resize */
-    min-height: 250px;
+    resize: none; 
+    min-height: 350px; /* 统一高度，更宽大 */
     box-sizing: border-box;
     transition: box-shadow 0.2s, border-color 0.2s;
 }
 
-/* 输入框的聚焦样式 (使其看起来更干净) */
-.input-column textarea {
+/* 输入框的样式 (模仿截图的干净和聚焦效果) */
+.input-wrapper textarea {
     border: 1px solid transparent; /* 默认无边框 */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.05); /* 细微阴影 */
-    min-height: 350px; /* 增加输入框高度以匹配截图 */
 }
-.input-column textarea:focus {
+.input-wrapper textarea:focus {
     outline: none;
     border-color: #1a73e8; /* 聚焦时蓝色边框 */
     box-shadow: 0 0 8px rgba(26, 115, 232, 0.2);
 }
 
 /* 输出框的样式 (使其看起来像纯文本区域) */
-.output-column .textarea-wrapper {
-    flex-grow: 1; /* 占据剩余空间 */
-}
-.output-column textarea {
+.output-wrapper textarea {
     border: none;
     background-color: transparent;
     padding: 0; /* 移除内边距以匹配截图的紧凑感 */
-    min-height: 200px; 
+    min-height: 350px; /* 统一高度 */
 }
 
 
@@ -183,10 +169,21 @@ textarea {
     opacity: 1;
 }
 
+/* 翻译按钮容器 (桌面端在下方，居右对齐) */
+.translate-button-wrapper {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    /* 桌面端：居右对齐 */
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    order: 3; /* 在移动端通过媒体查询调整顺序 */
+}
+
 /* 翻译按钮样式 (大且突出) */
 #translateButton {
-    /* 仅在桌面端占据右侧栏的一部分 */
-    width: 150px; /* 固定宽度，更具视觉冲击力 */
+    width: 150px; /* 固定宽度 */
     height: 50px; 
     padding: 10px 20px;
     background-color: #1a73e8; /* 强蓝色 */
@@ -208,7 +205,8 @@ textarea {
 /* 状态信息样式 */
 #statusMessage {
     text-align: center;
-    margin-top: 10px;
+    margin-right: auto; /* 桌面端状态信息被推到最左边 */
+    padding-left: 20px;
     font-weight: bold;
 }
 
@@ -413,15 +411,15 @@ textarea {
     }
     
     /* 移动端恢复 Input/Output 的 100% 宽度和垂直排列 */
-    .input-column, .output-column {
+    .input-wrapper, .output-wrapper {
         width: 100%;
         padding: 0;
         border-right: none;
+        margin-bottom: 15px;
     }
     
-    .input-column {
+    .input-wrapper {
         order: 1; /* Input 放在最前面 */
-        margin-bottom: 15px; /* 添加底部间距 */
     }
     
     /* 翻译按钮和状态信息容器 (位于 Input 和 Output 之间) */
@@ -431,10 +429,9 @@ textarea {
         justify-content: center; /* 按钮在移动端居中 */
     }
     
-    .output-column {
+    .output-wrapper {
         order: 3; /* Output 放在最后面 */
         margin-bottom: 20px; 
-        gap: 0; /* 移除按钮和输出内容之间的间距 */
     }
 
     /* 确保 translateButton 在移动端是全宽的 */
@@ -442,9 +439,15 @@ textarea {
         width: 100%;
         height: auto;
     }
+    
+    /* 移动端状态信息居中 */
+    #statusMessage {
+        margin-right: 0;
+        padding-left: 0;
+    }
 
     /* 恢复移动端 Text Area 的样式，使其有边框 */
-    .input-column textarea, .output-column textarea {
+    .input-wrapper textarea, .output-wrapper textarea {
         border: 1px solid #ccc;
         background-color: #fff;
         padding: 15px;
@@ -452,9 +455,19 @@ textarea {
     }
 
     /* 移除移动端 Input 的特殊阴影/边框 */
-    .input-column textarea {
+    .input-wrapper textarea {
         box-shadow: none;
     }
+    .input-wrapper textarea:focus {
+        border-color: #1a73e8; 
+        box-shadow: 0 0 8px rgba(26, 115, 232, 0.2);
+    }
+    .output-wrapper textarea {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        padding: 15px;
+    }
+
 
     /* 小屏幕上 API 相关的控件全部独占一行 */
     #apiEndpoint, #resetUrlButton, #apiKey, #modelSelect, #temperatureInput {
