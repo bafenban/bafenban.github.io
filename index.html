@@ -17,28 +17,25 @@
         </div>
         
         <div class="textarea-group">
-            <!-- 1. Input Wrapper (Left) -->
-            <div class="textarea-wrapper input-wrapper">
+            <!-- 输入框及其按钮的容器 -->
+            <div class="textarea-wrapper">
                 <textarea id="inputText" placeholder="在这里输入您需要翻译的文本..." rows="10"></textarea>
-                <!-- 清除按钮已移至右下角 -->
+                <!-- 新增：清除按钮 -->
                 <button id="clearInputButton" class="textarea-corner-btn clear-btn" title="清除全部内容">❌</button>
             </div>
             
-            <!-- 2. Output Wrapper (Right) -->
-            <div class="textarea-wrapper output-wrapper">
+            <!-- 输出框及其按钮的容器 -->
+            <div class="textarea-wrapper">
                 <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
-                <!-- 复制按钮已移至右下角 -->
+                <!-- 新增：复制按钮 -->
                 <button id="copyOutputButton" class="textarea-corner-btn copy-btn" title="复制全部翻译结果">📋</button>
             </div>
         </div>
+        
+        <button id="translateButton">翻译</button>
+        <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
 
-        <!-- 翻译按钮和状态信息 - 位于 textarea-group 外部，桌面端在下方 -->
-        <div class="translate-button-wrapper">
-            <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
-            <button id="translateButton">翻译</button> 
-        </div>
-
-        <!-- 历史记录面板 -->
+        <!-- 历史记录面板 (已移动到 API 设置上方) -->
         <details id="historyPanel" class="settings-panel history-panel">
             <summary>🕒 历史记录</summary>
             <div class="history-controls">
@@ -73,3 +70,4 @@
 </body>
 
 </html>
+
