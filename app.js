@@ -1,4 +1,4 @@
-// app.js (完整内容，支持流式输出、定制配置、本地存储和历史记录)
+// app.js (完整内容，支持流式输出、定制配置、本地存储、历史记录及自动隐藏提示)
 
 // 1. 数据定义与常量
 const DEFAULT_ENDPOINT = "https://api.openai.com/v1/chat/completions";
@@ -57,12 +57,30 @@ const historyList = document.getElementById('historyList');
 const clearHistoryButton = document.getElementById('clearHistoryButton');
 const historyCountSpan = document.getElementById('historyCount');
 
+// --- 新增：用于存储定时器 ID，防止冲突 ---
+let statusTimeout = null;
 
-// 3. 辅助函数：显示/隐藏状态信息
-function setStatus(message, isHidden = false, isError = false) {
+
+// 3. 辅助函数：显示/隐藏状态信息 (修改版：支持自动隐藏)
+// autoHideMs: 自动隐藏的毫秒数，0 表示不自动隐藏
+function setStatus(message, isHidden = false, isError = false, autoHideMs = 0) {
+    // 如果有正在运行的定时器，先清除它，防止旧的定时器关闭新的消息
+    if (statusTimeout) {
+        clearTimeout(statusTimeout);
+        statusTimeout = null;
+    }
+
     statusMessage.textContent = message;
     statusMessage.classList.toggle('status-hidden', isHidden);
     statusMessage.style.color = isError ? '#dc3545' : '#17a2b8';
+
+    // 如果设置了自动隐藏时间，且当前不是隐藏状态
+    if (!isHidden && autoHideMs > 0) {
+        statusTimeout = setTimeout(() => {
+            statusMessage.classList.add('status-hidden');
+            statusTimeout = null;
+        }, autoHideMs);
+    }
 }
 
 // 4. 初始化函数
@@ -133,7 +151,6 @@ function saveSetting(key, value) {
 function loadHistory() {
     try {
         const historyJson = localStorage.getItem(HISTORY_KEY);
-        // 历史记录存储为数组，并确保是有效的 JSON 格式
         return historyJson ? JSON.parse(historyJson) : [];
     } catch (e) {
         console.error("加载历史记录失败:", e);
@@ -157,30 +174,26 @@ function addHistoryEntry(sourceText, targetText, sourceLang, targetLang) {
         timestamp: new Date().toISOString(),
     };
 
-    // 检查是否重复（简化：只检查最近一条记录的文本是否完全相同）
     if (history.length > 0 && 
         history[0].source === sourceText && 
         history[0].translation === targetText) {
-        // 如果与最新记录重复，则不添加
         return;
     }
     
-    // 将新条目添加到数组开头
     history.unshift(newEntry);
 
-    // 保持最大记录数
     if (history.length > MAX_HISTORY_SIZE) {
         history = history.slice(0, MAX_HISTORY_SIZE);
     }
 
     saveHistory(history);
-    renderHistory(); // 重新渲染列表
+    renderHistory(); 
 }
 
 // 渲染历史记录列表
 function renderHistory() {
     const history = loadHistory();
-    historyList.innerHTML = ''; // 清空现有列表
+    historyList.innerHTML = ''; 
     
     historyCountSpan.textContent = `${history.length} 条记录`;
     
@@ -192,10 +205,8 @@ function renderHistory() {
     history.forEach((entry, index) => {
         const li = document.createElement('li');
         li.classList.add('history-item');
-        // 将完整的历史记录对象存储在 DOM 元素上，方便点击时读取
         li.dataset.index = index; 
         
-        // 截断文本以适应列表显示
         const SOURCE_LIMIT = 50;
         const TRANSLATION_LIMIT = 50;
 
@@ -222,7 +233,7 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
         return;
     }
 
-    // 更改：使用沙漏图标
+    // 翻译过程中不设置自动隐藏
     setStatus(`⏳ 正在使用 ${model} 模型请求翻译...`, false);
     outputText.value = '';
 
@@ -261,7 +272,6 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
         let translatedText = '';
         
         if (useStreaming) {
-            // --------------------- 流式处理逻辑 ---------------------
             const reader = response.body.getReader();
             const decoder = new TextDecoder("utf-8");
             
@@ -288,31 +298,29 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
                                 outputText.value = translatedText;
                                 outputText.scrollTop = outputText.scrollHeight; 
                             }
-                        } catch (e) {
-                            // 忽略不完整的 JSON 块
-                        }
+                        } catch (e) { }
                     }
                 }
             }
-            setStatus("✅ 翻译完成！", true);
-            // --------------------- 流式处理逻辑结束 ---------------------
+            // 修改：流式翻译完成后，显示“完成”，并在 3秒 后消失
+            setStatus("✅ 翻译完成！", false, false, 3000);
+
         } else {
-            // --------------------- 非流式处理逻辑 ---------------------
             const data = await response.json();
             translatedText = data.choices[0].message.content.trim(); 
             outputText.value = translatedText;
-            setStatus("✅ 翻译完成！", true);
-            // --------------------- 非流式处理逻辑结束 ---------------------
+            // 修改：非流式翻译完成后，显示“完成”，并在 3秒 后消失
+            setStatus("✅ 翻译完成！", false, false, 3000);
         }
 
-        // 7. 翻译成功后：添加历史记录
         if (translatedText.length > 0) {
             addHistoryEntry(text, translatedText, sourceLang, targetLang);
         }
 
     } catch (error) {
         console.error('翻译过程中发生错误:', error);
-        outputText.value = `翻译失败。请检查 API 配置、模型或网络连接。详细错误：${error.message}`;
+        outputText.value = `翻译失败。详细错误：${error.message}`;
+        // 错误信息不自动消失，或者设置较长的时间 (例如 10秒)
         setStatus(`❌ 翻译失败: ${error.message.substring(0, 80)}...`, false, true);
     } finally {
         translateButton.disabled = false;
@@ -335,7 +343,8 @@ translateButton.addEventListener('click', () => {
     const useStreaming = streamingModeCheckbox.checked;
 
     if (textToTranslate === "") {
-        setStatus("🤔 请输入要翻译的文本。", false);
+        // 修改：提示输入文本，3秒后自动消失
+        setStatus("🤔 请输入要翻译的文本。", false, false, 3000);
         return;
     }
     
@@ -354,26 +363,25 @@ translateButton.addEventListener('click', () => {
     );
 });
 
-// 清除输入按钮事件 (同时清空输入和输出框)
+// 清除输入按钮事件
 clearInputButton.addEventListener('click', () => {
     inputText.value = '';
     outputText.value = '';
-    setStatus("输入和输出文本已清除。", false);
+    // 修改：清除成功提示，2秒后消失
+    setStatus("输入和输出文本已清除。", false, false, 2000);
 });
 
 // 复制输出按钮事件
 copyOutputButton.addEventListener('click', () => {
     const textToCopy = outputText.value;
     if (textToCopy.trim() === "") {
-        setStatus("📋 复制失败：没有可复制的翻译结果。", false, true);
+        // 修改：复制失败提示，3秒后消失
+        setStatus("📋 复制失败：没有可复制的翻译结果。", false, true, 3000);
         return;
     }
     
-    // 使用 document.execCommand('copy') 实现跨浏览器复制（适用于iframe环境）
-    // 为了让 execCommand 成功，这里通过创建一个临时 textarea 来实现。
     const tempTextarea = document.createElement('textarea');
     tempTextarea.value = textToCopy;
-    // 隐藏元素但保持可操作性
     tempTextarea.style.position = 'fixed';
     tempTextarea.style.opacity = '0'; 
     document.body.appendChild(tempTextarea);
@@ -381,13 +389,14 @@ copyOutputButton.addEventListener('click', () => {
     try {
         const success = document.execCommand('copy');
         if (success) {
-            setStatus("✅ 翻译结果已成功复制到剪贴板！", false);
+            // 修改：复制成功提示，3秒后消失
+            setStatus("✅ 翻译结果已成功复制到剪贴板！", false, false, 3000);
         } else {
             throw new Error("浏览器不支持execCommand('copy')");
         }
     } catch (err) {
         console.error('复制操作失败:', err);
-        setStatus("❌ 复制失败，请手动复制。", false, true);
+        setStatus("❌ 复制失败，请手动复制。", false, true, 5000);
     } finally {
         document.body.removeChild(tempTextarea);
     }
@@ -398,11 +407,12 @@ copyOutputButton.addEventListener('click', () => {
 resetUrlButton.addEventListener('click', () => {
     apiEndpointInput.value = DEFAULT_ENDPOINT;
     saveSetting('llmEndpoint', DEFAULT_ENDPOINT);
-    setStatus("API 终端点已重置为默认值。", false);
+    // 修改：重置成功提示，3秒后消失
+    setStatus("API 终端点已重置为默认值。", false, false, 3000);
 });
 
 
-// 语言互换按钮事件 (已按用户要求修改)
+// 语言互换按钮事件
 swapButton.addEventListener('click', () => {
     const currentSource = sourceLangSelect.value;
     const currentTarget = targetLangSelect.value;
@@ -410,21 +420,13 @@ swapButton.addEventListener('click', () => {
     sourceLangSelect.value = currentTarget;
     targetLangSelect.value = currentSource;
 
-    // 根据用户要求：不再交换输入框和输出框的内容
-    // const currentInputText = inputText.value;
-    // const currentOutputText = outputText.value;
-    // inputText.value = currentOutputText;
-    // outputText.value = currentInputText;
-
     saveSetting('sourceLang', currentTarget);
     saveSetting('targetLang', currentSource);
-    
-    // 根据用户要求：不再显示提示信息
-    // setStatus("语言方向已互换。", false);
+    // 互换语言目前没有提示，如果需要可以加上
 });
 
 
-// 历史记录列表点击事件：加载记录到文本框
+// 历史记录列表点击事件
 historyList.addEventListener('click', (event) => {
     const item = event.target.closest('.history-item');
     if (!item) return;
@@ -434,35 +436,33 @@ historyList.addEventListener('click', (event) => {
     const entry = history[index];
 
     if (entry) {
-        // 1. 加载源文本和目标文本
         inputText.value = entry.source;
         outputText.value = entry.translation;
 
-        // 2. 加载语言设置
         sourceLangSelect.value = entry.sourceLang;
         targetLangSelect.value = entry.targetLang;
         
-        // 3. 保存语言设置到本地存储
         saveSetting('sourceLang', entry.sourceLang);
         saveSetting('targetLang', entry.targetLang);
 
-        setStatus(`已加载历史记录：[${LANGUAGE_OPTIONS[entry.sourceLang] || entry.sourceLang} -> ${LANGUAGE_OPTIONS[entry.targetLang] || entry.targetLang}]`, false);
+        // 修改：加载历史记录提示，3秒后消失
+        setStatus(`已加载历史记录：[${LANGUAGE_OPTIONS[entry.sourceLang] || entry.sourceLang} -> ${LANGUAGE_OPTIONS[entry.targetLang] || entry.targetLang}]`, false, false, 3000);
     }
 });
 
 // 清空历史记录按钮事件
 clearHistoryButton.addEventListener('click', () => {
-    
     const currentHistory = loadHistory();
     if (currentHistory.length === 0) {
-        setStatus("❌ 历史记录已经是空的了。", false, true);
+        // 修改：提示，3秒后消失
+        setStatus("❌ 历史记录已经是空的了。", false, true, 3000);
         return;
     }
     
-    // 实际执行清除
     localStorage.removeItem(HISTORY_KEY);
     renderHistory();
-    setStatus("✅ 历史记录已清空。", false);
+    // 修改：提示，3秒后消失
+    setStatus("✅ 历史记录已清空。", false, false, 3000);
 });
 
 
