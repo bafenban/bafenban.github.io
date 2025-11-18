@@ -347,13 +347,14 @@ translateButton.addEventListener('click', () => {
     );
 });
 
-// 新增：清除输入按钮事件
+// 清除输入按钮事件 (已修改：同时清空输出框)
 clearInputButton.addEventListener('click', () => {
     inputText.value = '';
-    setStatus("输入文本已清除。", false);
+    outputText.value = ''; // 新增：清空翻译结果
+    setStatus("输入和输出文本已清除。", false);
 });
 
-// 新增：复制输出按钮事件
+// 复制输出按钮事件
 copyOutputButton.addEventListener('click', () => {
     const textToCopy = outputText.value;
     if (textToCopy.trim() === "") {
