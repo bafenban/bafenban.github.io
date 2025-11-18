@@ -325,7 +325,7 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
         setStatus(`❌ 翻译失败: ${error.message.substring(0, 80)}...`, false, true);
     } finally {
         translateButton.disabled = false;
-        translateButton.textContent = '开始翻译';
+        translateButton.textContent = '翻译';
     }
 }
 
@@ -479,4 +479,5 @@ targetLangSelect.addEventListener('change', () => saveSetting('targetLang', targ
 
 // 页面加载时运行初始化
 window.onload = initializeApp;
+
 
