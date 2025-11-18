@@ -410,14 +410,15 @@ swapButton.addEventListener('click', () => {
     sourceLangSelect.value = currentTarget;
     targetLangSelect.value = currentSource;
 
-    const currentInputText = inputText.value;
-    const currentOutputText = outputText.value;
-    inputText.value = currentOutputText;
-    outputText.value = currentInputText;
+    // 已移除互换输入框和输出框文本的逻辑 (满足用户需求)
+    // const currentInputText = inputText.value;
+    // const currentOutputText = outputText.value;
+    // inputText.value = currentOutputText;
+    // outputText.value = currentInputText;
 
     saveSetting('sourceLang', currentTarget);
     saveSetting('targetLang', currentSource);
-    setStatus("语言方向已互换。", false);
+    // 已移除设置状态提示的逻辑 (满足用户需求)
 });
 
 
@@ -475,4 +476,3 @@ targetLangSelect.addEventListener('change', () => saveSetting('targetLang', targ
 
 // 页面加载时运行初始化
 window.onload = initializeApp;
-
