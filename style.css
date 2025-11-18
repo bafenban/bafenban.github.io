@@ -333,6 +333,26 @@ textarea {
 
 /* 媒体查询：小屏幕上所有配置项垂直堆叠 */
 @media (max-width: 768px) {
+    
+    /* 新增：减少移动设备上的容器内边距和宽度，以提供更多空间 */
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    /* 新增：让语言选择器在空间不足时可以换行 */
+    .lang-selection {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* 新增：为语言选择器设置一个最小宽度和基础，以便它们可以S'*/
+    .lang-select {
+        flex-grow: 1;
+        flex-basis: 120px; /* 设定一个基础宽度 */
+        min-width: 120px; /* 防止被过度压缩 */
+    }
+
     .textarea-group {
         flex-direction: column;
     }
