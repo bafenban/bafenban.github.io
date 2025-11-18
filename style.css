@@ -76,6 +76,8 @@ h1 {
 textarea {
     width: 100%; /* 占据包裹器的全部宽度 */
     padding: 15px;
+    /* 增加底部内边距，防止按钮遮挡内容 */
+    padding-bottom: 40px; 
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
@@ -84,10 +86,12 @@ textarea {
     box-sizing: border-box;
 }
 
-/* 新增：角落按钮通用样式 */
+/* * 更改：将按钮从右上角移动到右下角 
+ * top: 10px; -> bottom: 10px;
+ */
 .textarea-corner-btn {
     position: absolute;
-    top: 10px; /* 距离顶部 */
+    bottom: 20px; /* 更改：距离底部 (留出一些内边距空间) */
     right: 10px; /* 距离右侧 */
     padding: 5px 10px;
     border: none;
