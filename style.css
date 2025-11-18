@@ -1,4 +1,4 @@
-/* style.css (完整内容) */
+/* style.css (完整内容 - 已修复移动端布局) */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f7f9;
@@ -351,31 +351,37 @@ textarea {
     margin-top: 4px;
 }
 
-/* 媒体查询：小屏幕上所有配置项垂直堆叠 */
+/* 媒体查询：小屏幕适配 */
 @media (max-width: 768px) {
     
-    /* 新增：减少移动设备上的容器内边距和宽度，以提供更多空间 */
     .container {
         width: 95%;
         padding: 15px;
     }
 
-    /* 新增：让语言选择器在空间不足时可以换行 */
+    /* --- 修复开始：强制保持一行显示 --- */
     .lang-selection {
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-wrap: nowrap; /* 关键：禁止换行 */
+        justify-content: space-between;
+        gap: 5px; /* 稍微减小间距 */
     }
 
-    /* 新增：为语言选择器设置一个最小宽度和基础，以便它们可以S'*/
     .lang-select {
         flex-grow: 1;
-        flex-basis: 120px; /* 设定一个基础宽度 */
-        min-width: 120px; /* 防止被过度压缩 */
+        flex-basis: 0; /* 关键：让 flex-grow 决定宽度，无固定基准 */
+        min-width: 0;  /* 关键：允许无限缩小，防止撑开容器 */
+        width: auto;
+        padding: 10px 5px; /* 减小内边距以节省空间 */
     }
+    
+    #swapButton {
+        flex-shrink: 0; /* 关键：防止中间按钮被挤压 */
+        padding: 8px 12px;
+    }
+    /* --- 修复结束 --- */
 
-    /* 更改：设置移动端的 grid 布局 */
+    /* 移动端布局：垂直堆叠 */
     .textarea-group {
-        /* flex-direction: column; */
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto auto;
         grid-template-areas:
