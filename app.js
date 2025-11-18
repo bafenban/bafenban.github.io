@@ -5,12 +5,18 @@ const DEFAULT_ENDPOINT = "https://api.openai.com/v1/chat/completions";
 const HISTORY_KEY = 'translationHistory'; // 历史记录的本地存储键
 const MAX_HISTORY_SIZE = 10; // 最大历史记录条数
 
+// 增加常用语言
 const LANGUAGE_OPTIONS = {
     "Auto Detect": "自动检测",
     "Simplified Chinese": "简体中文",
     "English": "英文",
     "Japanese": "日文",
     "Traditional Chinese": "繁体中文",
+    "Korean": "韩文",
+    "French": "法文",
+    "German": "德文",
+    "Spanish": "西班牙文",
+    "Russian": "俄文",
 };
 
 const MODEL_OPTIONS = [
@@ -216,7 +222,8 @@ async function callLLMForTranslation(text, endpoint, key, model, temperature, so
         return;
     }
 
-    setStatus(`🚀 正在使用 ${model} 模型请求翻译...`, false);
+    // 更改：使用沙漏图标
+    setStatus(`⏳ 正在使用 ${model} 模型请求翻译...`, false);
     outputText.value = '';
 
     const sourceText = sourceLang === "Auto Detect" ? "源语言" : LANGUAGE_OPTIONS[sourceLang];
@@ -347,10 +354,10 @@ translateButton.addEventListener('click', () => {
     );
 });
 
-// 清除输入按钮事件 (已修改：同时清空输出框)
+// 清除输入按钮事件 (同时清空输入和输出框)
 clearInputButton.addEventListener('click', () => {
     inputText.value = '';
-    outputText.value = ''; // 新增：清空翻译结果
+    outputText.value = '';
     setStatus("输入和输出文本已清除。", false);
 });
 
@@ -363,7 +370,7 @@ copyOutputButton.addEventListener('click', () => {
     }
     
     // 使用 document.execCommand('copy') 实现跨浏览器复制（适用于iframe环境）
-    // 为了让 execCommand 成功，需要选择一些内容。这里通过创建一个临时 textarea 来实现。
+    // 为了让 execCommand 成功，这里通过创建一个临时 textarea 来实现。
     const tempTextarea = document.createElement('textarea');
     tempTextarea.value = textToCopy;
     // 隐藏元素但保持可操作性
