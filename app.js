@@ -8,21 +8,16 @@ const LANGUAGE_OPTIONS = {
     "Simplified Chinese": "简体中文",
     "English": "英文",
     "Japanese": "日文",
-    "Korean": "韩文",
     "Traditional Chinese": "繁体中文",
-    "French": "法文",
-    "German": "德文",
-    "Spanish": "西班牙文",
-    "Russian": "俄文",
 };
 
 const MODEL_OPTIONS = [
+    "gpt-5.1",
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
     "gpt-4o",
-    "gpt-4o-mini",
-    "gpt-4-turbo",
-    "gpt-3.5-turbo",
-    "gpt-4-0613",
-    "gpt-3.5-turbo-16k"
+    "gpt-4o-mini"
 ];
 
 
