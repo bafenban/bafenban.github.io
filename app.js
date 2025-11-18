@@ -475,4 +475,3 @@ targetLangSelect.addEventListener('change', () => saveSetting('targetLang', targ
 
 // 页面加载时运行初始化
 window.onload = initializeApp;
-
