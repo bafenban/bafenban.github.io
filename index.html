@@ -41,10 +41,22 @@
                 </div>
             </div>
         </details>
+
+        <!-- 新增：历史记录面板 -->
+        <details id="historyPanel" class="settings-panel history-panel">
+            <summary>🕒 翻译历史记录</summary>
+            <div class="history-controls">
+                <button id="clearHistoryButton">清空历史记录</button>
+                <span id="historyCount">0 条记录</span>
+            </div>
+            <ul id="historyList" class="history-list">
+                <!-- 历史记录项将由 JavaScript 渲染 -->
+            </ul>
+        </details>
+
     </div>
 
     <script src="app.js"></script>
 </body>
 
 </html>
-
