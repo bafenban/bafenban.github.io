@@ -402,7 +402,7 @@ resetUrlButton.addEventListener('click', () => {
 });
 
 
-// 语言互换按钮事件
+// 语言互换按钮事件 (已按用户要求修改)
 swapButton.addEventListener('click', () => {
     const currentSource = sourceLangSelect.value;
     const currentTarget = targetLangSelect.value;
@@ -410,14 +410,17 @@ swapButton.addEventListener('click', () => {
     sourceLangSelect.value = currentTarget;
     targetLangSelect.value = currentSource;
 
-    const currentInputText = inputText.value;
-    const currentOutputText = outputText.value;
-    inputText.value = currentOutputText;
-    outputText.value = currentInputText;
+    // 根据用户要求：不再交换输入框和输出框的内容
+    // const currentInputText = inputText.value;
+    // const currentOutputText = outputText.value;
+    // inputText.value = currentOutputText;
+    // outputText.value = currentInputText;
 
     saveSetting('sourceLang', currentTarget);
     saveSetting('targetLang', currentSource);
-    setStatus("语言方向已互换。", false);
+    
+    // 根据用户要求：不再显示提示信息
+    // setStatus("语言方向已互换。", false);
 });
 
 
