@@ -16,24 +16,28 @@
             <select id="targetLangSelect" class="lang-select"></select>
         </div>
         
+        <!-- 更改：将按钮和状态信息移入此组，并添加 ID -->
         <div class="textarea-group">
             <!-- 输入框及其按钮的容器 -->
-            <div class="textarea-wrapper">
+            <div class="textarea-wrapper" id="input-wrapper">
                 <textarea id="inputText" placeholder="在这里输入您需要翻译的文本..." rows="10"></textarea>
                 <!-- 新增：清除按钮 -->
                 <button id="clearInputButton" class="textarea-corner-btn clear-btn" title="清除全部内容">❌</button>
             </div>
             
             <!-- 输出框及其按钮的容器 -->
-            <div class="textarea-wrapper">
+            <div class="textarea-wrapper" id="output-wrapper">
                 <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
                 <!-- 新增：复制按钮 -->
                 <button id="copyOutputButton" class="textarea-corner-btn copy-btn" title="复制全部翻译结果">📋</button>
             </div>
+
+            <!-- 已移动到 .textarea-group 内部 -->
+            <button id="translateButton">翻译</button>
+            <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
         </div>
         
-        <button id="translateButton">翻译</button>
-        <p id="statusMessage" class="status-hidden">正在连接 LLM API...</p>
+        <!-- 按钮和状态信息已从这里移走 -->
 
         <!-- 历史记录面板 (已移动到 API 设置上方) -->
         <details id="historyPanel" class="settings-panel history-panel">
@@ -70,4 +74,3 @@
 </body>
 
 </html>
-
