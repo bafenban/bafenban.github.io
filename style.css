@@ -22,7 +22,7 @@ body {
 
 h1 {
     text-align: center;
-    color: #333; /* 更改：从 #007bff 改为 #333 (黑色) */
+    color: #333; /* 黑色 */
     margin-bottom: 25px;
 }
 
@@ -121,11 +121,11 @@ textarea {
     opacity: 1;
 }
 
-/* 翻译按钮样式 */
+/* 翻译按钮样式 - 使用柔和的蓝色 (#1a73e8) */
 #translateButton {
     width: 100%;
     padding: 15px;
-    background-color: #007bff; /* 更改：从绿色 #28a745 改为蓝色 #007bff */
+    background-color: #1a73e8; 
     color: white;
     border: none;
     border-radius: 8px;
@@ -135,7 +135,7 @@ textarea {
 }
 
 #translateButton:hover {
-    background-color: #0056b3; /* 更改：匹配新的蓝色 hover 效果 */
+    background-color: #1558b0; /* 略深 */
 }
 
 /* 状态信息样式 */
@@ -304,13 +304,13 @@ textarea {
 }
 
 .history-item:hover {
-    background-color: #e9f5ff; /* 浅蓝色高亮 */
-    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.1);
+    background-color: #f1f3f4; /* 浅灰色 hover 效果 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .history-item-source {
     font-weight: bold;
-    color: #007bff; /* 蓝色强调 */
+    color: #333; /* 更改：改为黑色 */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -318,7 +318,7 @@ textarea {
 }
 
 .history-item-translation {
-    color: #6c757d;
+    color: #555; /* 更改：改为深灰色 */
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
