@@ -350,7 +350,7 @@ translateButton.addEventListener('click', () => {
     }
     
     translateButton.disabled = true;
-    translateButton.textContent = useStreaming ? '正在连接...' : '正在翻译...';
+    translateButton.textContent = useStreaming ? '正在翻译...' : '正在翻译...';
 
     callLLMForTranslation(
         textToTranslate, 
@@ -479,5 +479,4 @@ targetLangSelect.addEventListener('change', () => saveSetting('targetLang', targ
 
 // 页面加载时运行初始化
 window.onload = initializeApp;
-
 
