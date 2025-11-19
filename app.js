@@ -93,21 +93,23 @@ function setupEventListeners() {
     });
 }
 
-// ================= UI 状态管理 =================
+// ================= UI 状态管理 (更新图标) =================
 function updateBtnState(isTranslating) {
     const btn = document.getElementById('btn-translate');
     if (isTranslating) {
+        // ★★★ 停止状态：停止图标 ★★★
         btn.innerHTML = '<i class="fas fa-stop mr-2"></i>停止';
         btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
         btn.classList.add('bg-red-500', 'hover:bg-red-600');
     } else {
-        btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>翻译';
+        // ★★★ 翻译状态：魔法棒图标 ★★★
+        btn.innerHTML = '<i class="fas fa-wand-magic-sparkles mr-2"></i>翻译';
         btn.classList.remove('bg-red-500', 'hover:bg-red-600');
         btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
     }
 }
 
-// ★★★ 更新：动态温度标签 (药丸形状 + 双色) ★★★
+// ================= 温度标签逻辑 =================
 function updateTempLabel(value) {
     const label = document.getElementById('temp-status-label');
     const val = parseFloat(value);
@@ -532,8 +534,10 @@ function renderHistoryList(history) {
                 <span class="text-xs text-gray-400">${item.timestamp}</span>
             </div>
             
-            <div class="mb-2 text-gray-900 text-base leading-relaxed break-words whitespace-pre-wrap">${item.original}</div>
-            <div class="border-t pt-2 text-gray-500 text-base leading-relaxed break-words whitespace-pre-wrap [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0">${marked.parse(item.translated || '')}</div>
+            <div class="flex flex-col md:flex-row md:gap-4">
+                <div class="w-full md:w-1/2 mb-2 md:mb-0 text-gray-900 text-base leading-relaxed break-words whitespace-pre-wrap">${item.original}</div>
+                <div class="w-full md:w-1/2 md:border-l md:border-gray-200 md:pl-4 border-t border-gray-100 pt-2 md:pt-0 md:border-t-0 text-gray-500 text-base leading-relaxed break-words whitespace-pre-wrap [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0">${marked.parse(item.translated || '')}</div>
+            </div>
         </div>
     `).join('');
 }
