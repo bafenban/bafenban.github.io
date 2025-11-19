@@ -1,6 +1,7 @@
 // ================= 配置与全局变量 =================
 const CONFIG_KEY = 'openai_translator_config_v2';
 const HISTORY_KEY = 'openai_translator_history_v2';
+const LANG_KEY = 'openai_translator_lang_prefs'; // 新增：语言偏好存储 Key
 
 // 全局控制器，用于管理请求生命周期
 let currentController = null; 
@@ -31,6 +32,7 @@ const langMap = {
 // ================= 初始化 =================
 document.addEventListener('DOMContentLoaded', () => {
     loadConfig();
+    loadLastUsedLangs(); // 新增：加载上次使用的语言
     loadHistory();
     setupEventListeners();
     toggleClearButton();
@@ -44,6 +46,10 @@ function setupEventListeners() {
     document.getElementById('tab-history').addEventListener('click', () => switchTab('history'));
     document.getElementById('btn-translate').addEventListener('click', doTranslate);
     document.getElementById('btn-swap-lang').addEventListener('click', swapLanguages);
+    
+    // 新增：监听语言选择变化并保存
+    document.getElementById('source-lang').addEventListener('change', saveCurrentLangs);
+    document.getElementById('target-lang').addEventListener('change', saveCurrentLangs);
     
     const inputBox = document.getElementById('input-text');
     inputBox.addEventListener('input', toggleClearButton);
@@ -70,6 +76,35 @@ function updateSliderBackground(slider) {
     slider.style.background = `linear-gradient(to right, #2563eb ${percentage}%, #e5e7eb ${percentage}%)`;
 }
 
+// 新增：加载上次保存的语言
+function loadLastUsedLangs() {
+    const saved = localStorage.getItem(LANG_KEY);
+    if (saved) {
+        try {
+            const { source, target } = JSON.parse(saved);
+            const sourceEl = document.getElementById('source-lang');
+            const targetEl = document.getElementById('target-lang');
+            
+            // 简单校验：确保保存的值在当前选项中存在（防止HTML更新后旧值失效）
+            if (source && sourceEl.querySelector(`option[value="${source}"]`)) {
+                sourceEl.value = source;
+            }
+            if (target && targetEl.querySelector(`option[value="${target}"]`)) {
+                targetEl.value = target;
+            }
+        } catch (e) {
+            console.error('Error loading language prefs', e);
+        }
+    }
+}
+
+// 新增：保存当前语言偏好
+function saveCurrentLangs() {
+    const source = document.getElementById('source-lang').value;
+    const target = document.getElementById('target-lang').value;
+    localStorage.setItem(LANG_KEY, JSON.stringify({ source, target }));
+}
+
 // ================= 界面逻辑 =================
 function swapLanguages() {
     const sourceEl = document.getElementById('source-lang');
@@ -78,6 +113,9 @@ function swapLanguages() {
     const temp = sourceEl.value;
     sourceEl.value = targetEl.value;
     targetEl.value = temp;
+    
+    // 交换后也要保存
+    saveCurrentLangs();
 }
 
 function clearInput() {
@@ -86,11 +124,9 @@ function clearInput() {
     inputBox.focus();
     toggleClearButton();
 
-    // ★★★ 新增逻辑：清空输出区域并恢复默认提示 ★★★
     const outputDiv = document.getElementById('output-text');
-    outputDiv.innerHTML = '<span class="text-gray-400 italic">翻译结果将会显示在这里...</span>';
+    outputDiv.innerHTML = '<span class="text-gray-400">翻译结果将会显示在这里...</span>';
 
-    // ★★★ 新增逻辑：如果正在翻译，立即终止 ★★★
     if (currentController) {
         currentController.abort();
         currentController = null;
