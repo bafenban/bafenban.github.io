@@ -15,12 +15,12 @@
 </head>
 <body class="bg-gray-50 text-gray-800 h-[100dvh] flex flex-col overflow-hidden">
 
-    <header class="flex justify-between items-center p-4 border-b bg-white shadow-sm flex-shrink-0">
-        <h1 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+    <header class="flex justify-between items-center p-3 border-b bg-white shadow-sm flex-shrink-0">
+        <h1 class="text-lg font-bold flex items-center gap-2 text-gray-800">
             <span>OpenAI 翻译器</span>
         </h1>
         <div>
-            <button id="btn-settings" class="text-gray-600 hover:text-gray-900 transition text-lg p-2">
+            <button id="btn-settings" class="text-gray-600 hover:text-gray-900 transition text-lg p-1">
                 <i class="fas fa-cog"></i>
             </button>
         </div>
@@ -28,10 +28,10 @@
 
     <main id="view-translate" class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
-        <div class="flex-1 flex flex-col p-4 md:border-r border-gray-200 bg-white min-h-0">
-            <div class="flex justify-between items-center mb-3 px-1 gap-4 flex-shrink-0">
+        <div class="flex-1 flex flex-col p-3 md:border-r border-gray-200 bg-white min-h-0">
+            <div class="flex justify-between items-center mb-2 px-1 gap-2 flex-shrink-0">
                 
-                <select id="source-lang" class="flex-1 w-full bg-transparent border-none outline-none cursor-pointer font-bold text-gray-700 hover:text-gray-900 transition text-center py-2">
+                <select id="source-lang" class="flex-1 w-full h-8 bg-transparent border-none outline-none cursor-pointer font-bold text-gray-700 hover:text-gray-900 transition text-center text-sm">
                     <option value="Auto">Auto</option>
                     <option value="zh-CN">简体中文</option>
                     <option value="zh-TW">正體中文</option>
@@ -44,11 +44,11 @@
                     <option value="ru">Русский</option>
                 </select>
                 
-                <button id="btn-swap-lang" class="text-gray-400 hover:text-gray-600 transition p-2 flex-shrink-0" title="交换语言">
+                <button id="btn-swap-lang" class="h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition text-sm" title="交换语言">
                     <i class="fas fa-exchange-alt"></i>
                 </button>
                 
-                <select id="target-lang" class="flex-1 w-full bg-transparent border-none outline-none cursor-pointer font-bold text-gray-700 hover:text-gray-900 transition text-center py-2">
+                <select id="target-lang" class="flex-1 w-full h-8 bg-transparent border-none outline-none cursor-pointer font-bold text-gray-700 hover:text-gray-900 transition text-center text-sm">
                     <option value="Auto">Auto</option>
                     <option value="zh-CN" selected>简体中文</option>
                     <option value="zh-TW">正體中文</option>
@@ -64,7 +64,7 @@
 
             <div class="flex-1 relative border border-gray-300 rounded-xl shadow-inner bg-gray-50 overflow-hidden group focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all">
                 <textarea id="input-text" 
-                    class="w-full h-full p-4 pr-10 resize-none outline-none bg-transparent text-lg leading-relaxed scrollbar-custom" 
+                    class="w-full h-full p-3 pr-10 resize-none outline-none bg-transparent text-base leading-relaxed scrollbar-custom" 
                     placeholder="请输入您想要翻译的文字..."></textarea>
                 
                 <button id="btn-clear-input" class="absolute bottom-3 right-3 text-gray-400 hover:text-red-500 bg-white rounded-full w-8 h-8 shadow-sm border border-gray-200 hidden group-hover:flex items-center justify-center transition" title="清除文字">
@@ -73,15 +73,15 @@
             </div>
         </div>
 
-        <div class="flex-1 flex flex-col p-4 bg-gray-50 min-h-0">
-            <div class="mb-3 flex-shrink-0">
-                <button id="btn-translate" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition transform active:scale-[0.99]">
+        <div class="flex-1 flex flex-col p-3 bg-gray-50 min-h-0">
+            <div class="mb-2 flex-shrink-0">
+                <button id="btn-translate" class="w-full h-8 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition transform active:scale-[0.99] text-sm">
                     翻译
                 </button>
             </div>
 
             <div class="flex-1 relative border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden group">
-                <div id="output-text" class="w-full h-full p-4 pb-12 text-lg text-gray-700 prose max-w-none overflow-y-auto scrollbar-custom leading-relaxed">
+                <div id="output-text" class="w-full h-full p-3 pb-12 text-base text-gray-700 prose max-w-none overflow-y-auto scrollbar-custom leading-relaxed">
                     <span class="text-gray-400">翻译结果将会显示在这里...</span>
                 </div>
                 
@@ -97,9 +97,9 @@
     </main>
 
     <main id="view-history" class="flex-1 flex-col overflow-hidden hidden bg-gray-50">
-        <div class="p-4 border-b bg-white shadow-sm flex justify-between items-center flex-shrink-0">
-            <h2 class="text-lg font-bold text-gray-800">历史记录</h2>
-            <button id="btn-clear-history" class="text-red-500 text-sm border border-red-200 px-3 py-1 rounded hover:bg-red-50 transition">清空所有</button>
+        <div class="p-2 border-b bg-white shadow-sm flex justify-between items-center flex-shrink-0 h-12">
+            <h2 class="text-base font-bold text-gray-800">历史记录</h2>
+            <button id="btn-clear-history" class="text-red-500 text-xs border border-red-200 px-2 py-1 rounded hover:bg-red-50 transition">清空所有</button>
         </div>
         <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-custom">
             </div>
