@@ -93,23 +93,20 @@ function setupEventListeners() {
     });
 }
 
-// ================= UI 状态管理 (更新图标) =================
+// ================= UI 状态管理 =================
 function updateBtnState(isTranslating) {
     const btn = document.getElementById('btn-translate');
     if (isTranslating) {
-        // ★★★ 停止状态：停止图标 ★★★
         btn.innerHTML = '<i class="fas fa-stop mr-2"></i>停止';
         btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
         btn.classList.add('bg-red-500', 'hover:bg-red-600');
     } else {
-        // ★★★ 翻译状态：魔法棒图标 ★★★
         btn.innerHTML = '<i class="fas fa-wand-magic-sparkles mr-2"></i>翻译';
         btn.classList.remove('bg-red-500', 'hover:bg-red-600');
         btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
     }
 }
 
-// ================= 温度标签逻辑 =================
 function updateTempLabel(value) {
     const label = document.getElementById('temp-status-label');
     const val = parseFloat(value);
@@ -455,9 +452,14 @@ Translate the above text enclosed with <translate_input> into ${toLang} without 
         }
 
         addToHistory(sourceVal, targetVal, inputText, fullText);
+        
+        // ★★★ 新增：翻译完成提示 ★★★
+        showToast("翻译完成", "success");
 
     } catch (error) {
         if (error.name === 'AbortError') {
+            // ★★★ 新增：翻译中止提示 ★★★
+            showToast("翻译中止", "error");
             return; 
         }
         
