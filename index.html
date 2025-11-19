@@ -30,7 +30,6 @@
         
         <div class="flex-1 flex flex-col p-3 md:border-r border-gray-200 bg-white min-h-0">
             <div class="flex justify-between items-center mb-2 px-1 gap-2 flex-shrink-0">
-                
                 <select id="source-lang" class="flex-1 w-full h-8 bg-transparent border-none outline-none cursor-pointer font-bold text-gray-700 hover:text-gray-900 transition text-center text-sm">
                     <option value="Auto">Auto</option>
                     <option value="zh-CN">简体中文</option>
@@ -115,7 +114,7 @@
     </footer>
 
     <div id="settings-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden backdrop-blur-sm transition-opacity"></div>
-    <div id="settings-panel" class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 p-6 flex flex-col overflow-y-auto">
+    <div id="settings-panel" class="fixed top-0 right-0 h-full w-80 max-w-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 p-6 flex flex-col overflow-y-auto">
         <div class="flex justify-between items-center mb-8 border-b pb-4">
             <h2 class="text-xl font-bold text-gray-800">设置</h2>
             <button id="btn-close-settings" class="text-gray-400 hover:text-gray-800 transition"><i class="fas fa-times text-xl"></i></button>
@@ -135,15 +134,15 @@
             <div>
                 <div class="flex justify-between mb-2">
                     <label class="block text-sm font-bold text-gray-700">API 地址</label>
-                    <button id="btn-reset-url" class="text-xs text-blue-500 hover:underline">重置默认</button>
+                    <button id="btn-reset-url" class="text-xs text-blue-500 hover:underline">重置为默认值</button>
                 </div>
                 <input type="text" id="api-url" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" placeholder="https://api.openai.com">
             </div>
 
             <div>
                 <div class="flex justify-between mb-2">
-                    <label class="block text-sm font-bold text-gray-700">API Key</label>
-                    <a href="https://platform.openai.com/api-keys" target="_blank" class="text-xs text-blue-500 hover:underline">获取 Key</a>
+                    <label class="block text-sm font-bold text-gray-700">API 密钥</label>
+                    <a href="https://platform.openai.com/api-keys" target="_blank" class="text-xs text-blue-500 hover:underline">点击这里获取密钥</a>
                 </div>
                 <input type="password" id="api-key" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" placeholder="sk-...">
             </div>
@@ -177,10 +176,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="mt-6 pt-6 border-t">
-            <button id="btn-save-settings" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold shadow transition">保存</button>
-        </div>
+    <div id="toast-notification" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[60] px-4 py-2 rounded-lg shadow-lg font-bold text-sm transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none flex items-center gap-2">
+        <i id="toast-icon" class="fas"></i>
+        <span id="toast-message"></span>
     </div>
 
     <script src="app.js"></script>
