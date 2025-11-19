@@ -3,8 +3,10 @@ const CONFIG_KEY = 'openai_translator_config_v2';
 const HISTORY_KEY = 'openai_translator_history_v2';
 const LANG_KEY = 'openai_translator_lang_prefs';
 
-// 全局控制器
+// 全局控制器 & 状态
 let currentController = null; 
+let toastTimeout = null;
+let settingsDirty = false; 
 
 // 默认配置
 let config = {
@@ -31,6 +33,9 @@ const langMap = {
 
 // ================= 初始化 =================
 document.addEventListener('DOMContentLoaded', () => {
+    // 配置 marked 支持软换行
+    marked.setOptions({ breaks: true });
+
     loadConfig();
     loadLastUsedLangs(); 
     loadHistory();
@@ -60,13 +65,51 @@ function setupEventListeners() {
     document.getElementById('settings-overlay').addEventListener('click', closeSettings);
     document.getElementById('btn-close-settings').addEventListener('click', closeSettings);
     document.getElementById('btn-reset-url').addEventListener('click', resetUrl);
-    document.getElementById('btn-save-settings').addEventListener('click', saveSettingsAndClose);
     
     const slider = document.getElementById('temp-slider');
     slider.addEventListener('input', (e) => {
         document.getElementById('temp-display').innerText = e.target.value;
         updateSliderBackground(e.target);
     });
+
+    // 监听设置变更，标记状态
+    const settingInputs = ['api-url', 'api-key', 'model-select', 'stream-toggle', 'temp-slider'];
+    settingInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => { settingsDirty = true; });
+            el.addEventListener('change', () => { settingsDirty = true; });
+        }
+    });
+}
+
+// ================= Toast 逻辑 =================
+function showToast(message, type) {
+    const toast = document.getElementById('toast-notification');
+    const icon = document.getElementById('toast-icon');
+    const msg = document.getElementById('toast-message');
+    
+    if (toastTimeout) clearTimeout(toastTimeout);
+    
+    msg.innerText = message;
+    
+    toast.className = "fixed top-6 left-1/2 transform -translate-x-1/2 z-[60] px-4 py-2 rounded-lg shadow-lg font-bold text-sm transition-all duration-300 flex items-center gap-2 pointer-events-none";
+    
+    if (type === 'success') {
+        toast.classList.add('bg-green-100', 'text-green-600', 'border', 'border-green-200');
+        icon.className = "fas fa-check-circle";
+    } else if (type === 'error') {
+        toast.classList.add('bg-red-100', 'text-red-600', 'border', 'border-red-200');
+        icon.className = "fas fa-exclamation-circle";
+    }
+    
+    requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', '-translate-y-10');
+    });
+    
+    toastTimeout = setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-10');
+    }, 2000);
 }
 
 // ================= 辅助函数 =================
@@ -205,7 +248,7 @@ function loadConfig() {
     updateSliderBackground(document.getElementById('temp-slider'));
 }
 
-function saveSettingsAndClose() {
+function saveConfigFromUI() {
     let url = document.getElementById('api-url').value.trim();
     config.apiUrl = url.replace(/\/+$/, ""); 
     config.apiKey = document.getElementById('api-key').value.trim();
@@ -214,21 +257,30 @@ function saveSettingsAndClose() {
     config.stream = document.getElementById('stream-toggle').checked;
     
     localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    closeSettings();
 }
 
 function openSettings() {
+    loadConfig(); 
+    settingsDirty = false;
+
     document.getElementById('settings-overlay').classList.remove('hidden');
     document.getElementById('settings-panel').classList.remove('translate-x-full');
 }
 
 function closeSettings() {
+    if (settingsDirty) {
+        saveConfigFromUI();
+        showToast("设置已保存", "success");
+        settingsDirty = false;
+    }
+
     document.getElementById('settings-overlay').classList.add('hidden');
     document.getElementById('settings-panel').classList.add('translate-x-full');
 }
 
 function resetUrl() {
     document.getElementById('api-url').value = "https://api.openai.com";
+    settingsDirty = true; // 重置视为修改
 }
 
 // ================= 翻译核心逻辑 =================
@@ -416,10 +468,10 @@ function renderHistoryList(history) {
         return;
     }
 
-    // 修复样式：输入黑(gray-900)，输出灰(gray-500)，字体都是 text-sm
+    // ★★★ 修复：字体 text-base，并移除标签换行以消除空格 ★★★
     container.innerHTML = history.map(item => `
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
-            <div class="flex justify-between items-center mb-3">
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+            <div class="flex justify-between items-center mb-2">
                 <div class="flex items-center gap-2 text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">
                     <span>${item.from}</span>
                     <i class="fas fa-arrow-right text-gray-400"></i>
@@ -428,12 +480,8 @@ function renderHistoryList(history) {
                 <span class="text-xs text-gray-400">${item.timestamp}</span>
             </div>
             
-            <div class="mb-3 text-gray-900 text-sm leading-relaxed break-words">
-                ${item.original}
-            </div>
-            <div class="border-t pt-2 text-gray-500 text-sm leading-relaxed break-words">
-                ${marked.parse(item.translated || '')}
-            </div>
+            <div class="mb-2 text-gray-900 text-base leading-relaxed break-words whitespace-pre-wrap">${item.original}</div>
+            <div class="border-t pt-2 text-gray-500 text-base leading-relaxed break-words whitespace-pre-wrap [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0">${marked.parse(item.translated || '')}</div>
         </div>
     `).join('');
 }
