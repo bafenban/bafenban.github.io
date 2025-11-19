@@ -1,82 +1,188 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OpenAI 翻译器</title>
+    
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="container">
-        <h1>OpenAI 翻译器</h1>
-        
-        <div class="lang-selection">
-            <select id="sourceLangSelect" class="lang-select"></select>
-            <button id="swapButton" title="互换语言">⇌</button>
-            <select id="targetLangSelect" class="lang-select"></select>
+<body class="bg-gray-50 text-gray-800 h-[100dvh] flex flex-col">
+
+    <header class="flex justify-between items-center p-4 border-b bg-white shadow-sm flex-shrink-0">
+        <h1 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+            <span>OpenAI 翻译器</span>
+        </h1>
+        <div>
+            <button id="btn-settings" class="text-gray-600 hover:text-gray-900 transition text-lg p-2">
+                <i class="fas fa-cog"></i>
+            </button>
         </div>
+    </header>
+
+    <main id="view-translate" class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
-        <!-- 更改：将按钮和状态信息移入此组，并添加 ID -->
-        <div class="textarea-group">
-            <!-- 输入框及其按钮的容器 -->
-            <div class="textarea-wrapper" id="input-wrapper">
-                <textarea id="inputText" placeholder="在这里输入您需要翻译的文本..." rows="10"></textarea>
-                <!-- 新增：清除按钮 -->
-                <button id="clearInputButton" class="textarea-corner-btn clear-btn" title="清除全部内容">❌</button>
-            </div>
-            
-            <!-- 输出框及其按钮的容器 -->
-            <div class="textarea-wrapper" id="output-wrapper">
-                <textarea id="outputText" placeholder="翻译结果将显示在这里..." rows="10" readonly></textarea>
-                <!-- 新增：复制按钮 -->
-                <button id="copyOutputButton" class="textarea-corner-btn copy-btn" title="复制全部翻译结果">📋</button>
+        <div class="flex-1 flex flex-col p-4 md:border-r border-gray-200 bg-white min-h-0">
+            <div class="flex justify-between items-center mb-3 px-1 gap-4 flex-shrink-0">
+                
+                <select id="source-lang" class="flex-1 w-full bg-transparent border-none outline-none cursor-pointer font-bold text-gray-700 hover:text-gray-900 transition text-left py-2">
+                    <option value="Auto">Auto</option>
+                    <option value="zh-CN">简体中文</option>
+                    <option value="zh-TW">正體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="es">Español</option>
+                    <option value="ru">Русский</option>
+                </select>
+                
+                <button id="btn-swap-lang" class="text-gray-400 hover:text-gray-600 transition p-2 flex-shrink-0" title="交换语言">
+                    <i class="fas fa-exchange-alt"></i>
+                </button>
+                
+                <select id="target-lang" class="flex-1 w-full bg-transparent border-none outline-none cursor-pointer font-bold text-gray-700 hover:text-gray-900 transition text-right py-2">
+                    <option value="Auto">Auto</option>
+                    <option value="zh-CN" selected>简体中文</option>
+                    <option value="zh-TW">正體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="es">Español</option>
+                    <option value="ru">Русский</option>
+                </select>
             </div>
 
-            <!-- 已移动到 .textarea-group 内部 -->
-            <button id="translateButton">翻译</button>
-            <p id="statusMessage" class="status-hidden">正在翻译...</p>
+            <div class="flex-1 relative border border-gray-300 rounded-xl shadow-inner bg-gray-50 overflow-hidden group focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all">
+                <textarea id="input-text" 
+                    class="w-full h-full p-4 pr-10 resize-none outline-none bg-transparent text-lg leading-relaxed scrollbar-custom" 
+                    placeholder="请输入您想要翻译的文字..."></textarea>
+                
+                <button id="btn-clear-input" class="absolute bottom-3 right-3 text-gray-400 hover:text-red-500 bg-white rounded-full w-8 h-8 shadow-sm border border-gray-200 hidden group-hover:flex items-center justify-center transition" title="清除文字">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
         </div>
-        
-        <!-- 按钮和状态信息已从这里移走 -->
 
-        <!-- 历史记录面板 (已移动到 API 设置上方) -->
-        <details id="historyPanel" class="settings-panel history-panel">
-            <summary>🕒 历史记录</summary>
-            <div class="history-controls">
-                <button id="clearHistoryButton">清空历史记录</button>
-                <span id="historyCount">0 条记录</span>
+        <div class="flex-1 flex flex-col p-4 bg-gray-50 min-h-0">
+            <div class="mb-3 flex-shrink-0">
+                <button id="btn-translate" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition transform active:scale-[0.99]">
+                    翻译
+                </button>
             </div>
-            <ul id="historyList" class="history-list">
-                <!-- 历史记录项将由 JavaScript 渲染 -->
-            </ul>
-        </details>
 
-        <details class="settings-panel">
-            <summary>⚙️ API & 模型设置</summary>
-            <div class="api-config">
-                <input type="text" id="apiEndpoint" placeholder="OpenAI API 终端点 (默认: https://...)" value="https://api.openai.com/v1/chat/completions">
-                <button id="resetUrlButton" title="重置为默认 OpenAI URL">重置 URL</button>
+            <div class="flex-1 relative border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden group">
+                <div id="output-text" class="w-full h-full p-4 pb-12 text-lg text-gray-700 prose max-w-none overflow-y-auto scrollbar-custom leading-relaxed">
+                    <span class="text-gray-400">翻译结果将会显示在这里...</span>
+                </div>
                 
-                <input type="password" id="apiKey" placeholder="您的 OpenAI API 密钥" autocomplete="off">
-                
-                <select id="modelSelect"></select>
-                <input type="number" id="temperatureInput" placeholder="Temperature (0.0 - 2.0)" min="0.0" max="2.0" step="0.1" value="0.1">
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="streamingModeCheckbox" checked>
-                    <label for="streamingModeCheckbox">使用流式输出</label>
+                <div id="loading-indicator" class="hidden absolute top-4 left-4 bg-white/80 backdrop-blur px-3 py-1 rounded-full border border-blue-100 text-blue-600 text-sm font-medium shadow-sm">
+                    <i class="fas fa-circle-notch fa-spin mr-1"></i> 请稍等...
+                </div>
+
+                <button id="btn-copy-output" class="absolute bottom-3 right-3 text-gray-400 hover:text-green-600 bg-gray-50 hover:bg-white rounded-full w-8 h-8 shadow-sm border border-gray-200 flex items-center justify-center transition" title="复制结果">
+                    <i class="far fa-copy"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <main id="view-history" class="flex-1 flex-col overflow-hidden hidden bg-gray-50">
+        <div class="p-4 border-b bg-white shadow-sm flex justify-between items-center flex-shrink-0">
+            <h2 class="text-lg font-bold text-gray-800">历史记录</h2>
+            <button id="btn-clear-history" class="text-red-500 text-sm border border-red-200 px-3 py-1 rounded hover:bg-red-50 transition">清空所有</button>
+        </div>
+        <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-custom">
+            </div>
+    </main>
+
+    <footer class="flex justify-center gap-16 p-1 border-t bg-white z-10 flex-shrink-0">
+        <button id="tab-translate" class="text-blue-600 flex flex-col items-center justify-center gap-1 w-16 h-8 hover:bg-gray-50 rounded-lg transition">
+            <i class="fas fa-language text-lg"></i>
+        </button>
+        <button id="tab-history" class="text-gray-400 flex flex-col items-center justify-center gap-1 w-16 h-8 hover:bg-gray-50 rounded-lg transition">
+            <i class="fas fa-history text-lg"></i>
+        </button>
+    </footer>
+
+    <div id="settings-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+    <div id="settings-panel" class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 p-6 flex flex-col overflow-y-auto">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <h2 class="text-xl font-bold text-gray-800">设置</h2>
+            <button id="btn-close-settings" class="text-gray-400 hover:text-gray-800 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+
+        <div class="space-y-8 flex-1">
+            <div class="flex justify-between items-center">
+                <div>
+                    <label class="font-bold text-gray-700 block">流式输出</label>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="stream-toggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 shadow-inner"></div>
+                </label>
+            </div>
+
+            <div>
+                <div class="flex justify-between mb-2">
+                    <label class="block text-sm font-bold text-gray-700">API 地址</label>
+                    <button id="btn-reset-url" class="text-xs text-blue-500 hover:underline">重置默认</button>
+                </div>
+                <input type="text" id="api-url" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" placeholder="https://api.openai.com">
+            </div>
+
+            <div>
+                <div class="flex justify-between mb-2">
+                    <label class="block text-sm font-bold text-gray-700">API Key</label>
+                    <a href="https://platform.openai.com/api-keys" target="_blank" class="text-xs text-blue-500 hover:underline">获取 Key</a>
+                </div>
+                <input type="password" id="api-key" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm" placeholder="sk-...">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">模型</label>
+                <div class="relative">
+                    <select id="model-select" class="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-sm">
+                        <option value="gpt-4o-mini" selected>gpt-4o-mini</option>
+                        <option value="gpt-4o">gpt-4o</option>
+                        <option value="gpt-4.1-nano">gpt-4.1-nano</option>
+                        <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+                        <option value="gpt-4.1">gpt-4.1</option>
+                        <option value="gpt-5.1">gpt-5.1</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
                 </div>
             </div>
-        </details>
+
+            <div>
+                <div class="flex justify-between mb-2">
+                    <label class="block text-sm font-bold text-gray-700">模型温度</label>
+                    <span id="temp-display" class="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded">0.1</span>
+                </div>
+                <input type="range" id="temp-slider" min="0" max="2" step="0.1" value="0.1" class="slider-custom w-full h-2 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>保守 (0)</span>
+                    <span>创意 (2)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 pt-6 border-t">
+            <button id="btn-save-settings" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold shadow transition">保存</button>
+        </div>
     </div>
 
     <script src="app.js"></script>
 </body>
-
 </html>
-
-
-
-
-
