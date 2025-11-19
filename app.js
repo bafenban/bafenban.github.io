@@ -33,7 +33,6 @@ const langMap = {
 
 // ================= 初始化 =================
 document.addEventListener('DOMContentLoaded', () => {
-    // 配置 marked 支持软换行
     marked.setOptions({ breaks: true });
 
     loadConfig();
@@ -41,7 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistory();
     setupEventListeners();
     toggleClearButton();
-    updateSliderBackground(document.getElementById('temp-slider'));
+    
+    const slider = document.getElementById('temp-slider');
+    updateSliderBackground(slider);
+    updateTempLabel(slider.value);
 });
 
 // ================= 事件监听 =================
@@ -50,7 +52,6 @@ function setupEventListeners() {
     document.getElementById('tab-translate').addEventListener('click', () => switchTab('translate'));
     document.getElementById('tab-history').addEventListener('click', () => switchTab('history'));
     
-    // 翻译按钮逻辑
     document.getElementById('btn-translate').addEventListener('click', () => {
         if (currentController) {
             currentController.abort();
@@ -79,9 +80,9 @@ function setupEventListeners() {
     slider.addEventListener('input', (e) => {
         document.getElementById('temp-display').innerText = e.target.value;
         updateSliderBackground(e.target);
+        updateTempLabel(e.target.value);
     });
 
-    // 监听设置变更
     const settingInputs = ['api-url', 'api-key', 'model-select', 'stream-toggle', 'temp-slider'];
     settingInputs.forEach(id => {
         const el = document.getElementById(id);
@@ -92,20 +93,43 @@ function setupEventListeners() {
     });
 }
 
-// ================= UI 状态管理 (更新版) =================
+// ================= UI 状态管理 =================
 function updateBtnState(isTranslating) {
     const btn = document.getElementById('btn-translate');
     if (isTranslating) {
-        // ★★★ 停止状态：显示停止图标 ★★★
         btn.innerHTML = '<i class="fas fa-stop mr-2"></i>停止';
         btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
         btn.classList.add('bg-red-500', 'hover:bg-red-600');
     } else {
-        // ★★★ 翻译状态：显示纸飞机图标 ★★★
         btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>翻译';
         btn.classList.remove('bg-red-500', 'hover:bg-red-600');
         btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
     }
+}
+
+// ★★★ 更新：动态温度标签 (药丸形状 + 双色) ★★★
+function updateTempLabel(value) {
+    const label = document.getElementById('temp-status-label');
+    const val = parseFloat(value);
+    let text = '';
+    let colorClass = '';
+
+    if (val <= 0.3) {
+        text = '严谨';
+        colorClass = 'text-blue-600 bg-blue-100';
+    } else if (val <= 1.0) {
+        text = '平衡';
+        colorClass = 'text-green-600 bg-green-100';
+    } else if (val <= 1.5) {
+        text = '创造';
+        colorClass = 'text-yellow-700 bg-yellow-100';
+    } else {
+        text = '混乱';
+        colorClass = 'text-red-600 bg-red-100';
+    }
+
+    label.innerText = text;
+    label.className = `text-xs font-bold px-3 py-1 rounded-full transition-colors duration-300 ${colorClass}`;
 }
 
 // ================= Toast 逻辑 =================
@@ -192,7 +216,6 @@ function clearInput() {
 
     if (currentController) {
         currentController.abort();
-        currentController = null;
         document.getElementById('loading-indicator').classList.add('hidden');
     }
 }
@@ -271,6 +294,7 @@ function loadConfig() {
     document.getElementById('stream-toggle').checked = config.stream;
     
     updateSliderBackground(document.getElementById('temp-slider'));
+    updateTempLabel(config.temperature);
 }
 
 function saveConfigFromUI() {
@@ -333,7 +357,7 @@ async function doTranslate() {
     outputDiv.innerHTML = ''; 
     loading.classList.remove('hidden');
     
-    updateBtnState(true); // 按钮变红
+    updateBtnState(true);
 
     const fromLang = sourceVal === 'Auto' ? 'input language' : (langMap[sourceVal] || sourceVal);
     const toLang = langMap[targetVal] || targetVal;
@@ -444,7 +468,7 @@ Translate the above text enclosed with <translate_input> into ${toLang} without 
         if (currentController && currentController.signal === signal) {
             currentController = null;
             loading.classList.add('hidden');
-            updateBtnState(false); // 按钮变蓝
+            updateBtnState(false);
         }
     }
 }
