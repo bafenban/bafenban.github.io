@@ -1,9 +1,9 @@
 // ================= 配置与全局变量 =================
 const CONFIG_KEY = 'openai_translator_config_v2';
 const HISTORY_KEY = 'openai_translator_history_v2';
-const LANG_KEY = 'openai_translator_lang_prefs'; // 新增：语言偏好存储 Key
+const LANG_KEY = 'openai_translator_lang_prefs';
 
-// 全局控制器，用于管理请求生命周期
+// 全局控制器
 let currentController = null; 
 
 // 默认配置
@@ -32,7 +32,7 @@ const langMap = {
 // ================= 初始化 =================
 document.addEventListener('DOMContentLoaded', () => {
     loadConfig();
-    loadLastUsedLangs(); // 新增：加载上次使用的语言
+    loadLastUsedLangs(); 
     loadHistory();
     setupEventListeners();
     toggleClearButton();
@@ -47,7 +47,6 @@ function setupEventListeners() {
     document.getElementById('btn-translate').addEventListener('click', doTranslate);
     document.getElementById('btn-swap-lang').addEventListener('click', swapLanguages);
     
-    // 新增：监听语言选择变化并保存
     document.getElementById('source-lang').addEventListener('change', saveCurrentLangs);
     document.getElementById('target-lang').addEventListener('change', saveCurrentLangs);
     
@@ -76,7 +75,6 @@ function updateSliderBackground(slider) {
     slider.style.background = `linear-gradient(to right, #2563eb ${percentage}%, #e5e7eb ${percentage}%)`;
 }
 
-// 新增：加载上次保存的语言
 function loadLastUsedLangs() {
     const saved = localStorage.getItem(LANG_KEY);
     if (saved) {
@@ -85,7 +83,6 @@ function loadLastUsedLangs() {
             const sourceEl = document.getElementById('source-lang');
             const targetEl = document.getElementById('target-lang');
             
-            // 简单校验：确保保存的值在当前选项中存在（防止HTML更新后旧值失效）
             if (source && sourceEl.querySelector(`option[value="${source}"]`)) {
                 sourceEl.value = source;
             }
@@ -98,7 +95,6 @@ function loadLastUsedLangs() {
     }
 }
 
-// 新增：保存当前语言偏好
 function saveCurrentLangs() {
     const source = document.getElementById('source-lang').value;
     const target = document.getElementById('target-lang').value;
@@ -114,7 +110,6 @@ function swapLanguages() {
     sourceEl.value = targetEl.value;
     targetEl.value = temp;
     
-    // 交换后也要保存
     saveCurrentLangs();
 }
 
@@ -241,7 +236,6 @@ async function doTranslate() {
     const inputText = document.getElementById('input-text').value.trim();
     if (!inputText) return;
 
-    // 1. 强制中断上一次请求
     if (currentController) {
         currentController.abort();
         currentController = null;
@@ -422,6 +416,7 @@ function renderHistoryList(history) {
         return;
     }
 
+    // 修复样式：输入黑(gray-900)，输出灰(gray-500)，字体都是 text-sm
     container.innerHTML = history.map(item => `
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div class="flex justify-between items-center mb-3">
@@ -433,10 +428,10 @@ function renderHistoryList(history) {
                 <span class="text-xs text-gray-400">${item.timestamp}</span>
             </div>
             
-            <div class="mb-3 text-gray-600 text-sm leading-relaxed break-words">
+            <div class="mb-3 text-gray-900 text-sm leading-relaxed break-words">
                 ${item.original}
             </div>
-            <div class="border-t pt-2 text-gray-800 font-medium text-base leading-relaxed break-words">
+            <div class="border-t pt-2 text-gray-500 text-sm leading-relaxed break-words">
                 ${marked.parse(item.translated || '')}
             </div>
         </div>
