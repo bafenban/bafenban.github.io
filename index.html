@@ -72,14 +72,15 @@
             </div>
         </div>
 
-        <div class="flex-1 flex flex-col p-3 bg-gray-50 min-h-0">
-            <div class="mb-2 flex-shrink-0">
-                <button id="btn-translate" class="w-full h-8 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition transform active:scale-[0.99] text-sm">
+        <div class="flex-1 flex flex-col px-3 pb-3 pt-0 md:p-3 bg-gray-50 min-h-0 relative">
+            
+            <div class="flex justify-center -mt-5 -mb-5 md:mt-0 md:mb-2 md:block flex-shrink-0 relative z-10">
+                <button id="btn-translate" class="w-auto px-8 md:w-full h-10 md:h-8 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-full md:rounded-lg font-bold shadow-xl md:shadow-md hover:shadow-2xl transition transform active:scale-[0.99] text-sm">
                     <i class="fas fa-wand-magic-sparkles mr-2"></i>翻译
                 </button>
             </div>
 
-            <div class="flex-1 relative border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden group">
+            <div class="flex-1 relative border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden group mt-4 md:mt-0">
                 <div id="output-text" class="w-full h-full p-3 pb-12 text-base text-gray-700 prose max-w-none overflow-y-auto scrollbar-custom leading-relaxed">
                     <span class="text-gray-400">翻译结果将会显示在这里...</span>
                 </div>
@@ -118,7 +119,6 @@
     </footer>
 
     <div id="settings-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden backdrop-blur-sm transition-opacity"></div>
-    
     <div id="settings-panel" class="fixed top-0 right-0 h-full w-80 max-w-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
         
         <div class="flex justify-between items-center p-3 border-b flex-shrink-0">
