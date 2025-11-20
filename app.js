@@ -318,7 +318,8 @@ function openSettings() {
 function closeSettings() {
     if (settingsDirty) {
         saveConfigFromUI();
-        showToast("设置已保存", "success");
+        // ★★★ 修改：修改提示文字为“设置已更新” ★★★
+        showToast("设置已更新", "success");
         settingsDirty = false;
     }
 
@@ -452,13 +453,10 @@ Translate the above text enclosed with <translate_input> into ${toLang} without 
         }
 
         addToHistory(sourceVal, targetVal, inputText, fullText);
-        
-        // ★★★ 新增：翻译完成提示 ★★★
         showToast("翻译完成", "success");
 
     } catch (error) {
         if (error.name === 'AbortError') {
-            // ★★★ 新增：翻译中止提示 ★★★
             showToast("翻译中止", "error");
             return; 
         }
