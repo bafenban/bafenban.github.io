@@ -1,7 +1,19 @@
 /* 全局设置 */
+html {
+    /* ★★★ 关键修复：防止移动端视口水平偏移 ★★★ */
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    width: 100%;
+}
+
 body { 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+    /* ★★★ 关键修复：确保 body 宽度被锁定 ★★★ */
+    width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    position: relative; /* 辅助定位 */
 }
 
 /* 自定义滚动条样式 */
